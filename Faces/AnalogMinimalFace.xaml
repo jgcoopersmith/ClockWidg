@@ -1,0 +1,5 @@
+<UserControl x:Class="ClockWidg.Faces.AnalogMinimalFace"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Canvas x:Name="ClockCanvas" Background="#1a1a2e" SizeChanged="Canvas_SizeChanged"/>
+</UserControl>

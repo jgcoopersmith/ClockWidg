@@ -1,0 +1,12 @@
+<UserControl x:Class="ClockWidg.Faces.DigitalLcdFace"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid Background="#0d0d0d">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+            <TextBlock x:Name="TimeText" FontFamily="Courier New" FontSize="36"
+                       Foreground="#FFA500" TextAlignment="Center" FontWeight="Bold"/>
+            <TextBlock x:Name="DateText" FontFamily="Courier New" FontSize="14"
+                       Foreground="#FF8C00" TextAlignment="Center" Margin="0,4,0,0"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

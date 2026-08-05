@@ -1,0 +1,46 @@
+<Window x:Class="ClockWidg.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ClockWidg"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="CanResize"
+        MinWidth="120" MinHeight="120"
+        MouseLeftButtonDown="Window_MouseLeftButtonDown">
+    <Window.ContextMenu>
+        <ContextMenu x:Name="MainContextMenu">
+            <MenuItem Header="Clock Face" x:Name="MenuFace">
+                <MenuItem Header="Analog Classic"  Tag="AnalogClassic"  Click="FaceMenuItem_Click"/>
+                <MenuItem Header="Analog Minimal"  Tag="AnalogMinimal"  Click="FaceMenuItem_Click"/>
+                <MenuItem Header="Analog Vintage"  Tag="AnalogVintage"  Click="FaceMenuItem_Click"/>
+                <MenuItem Header="Analog Neon"     Tag="AnalogNeon"     Click="FaceMenuItem_Click"/>
+                <MenuItem Header="Digital LCD"     Tag="DigitalLcd"     Click="FaceMenuItem_Click"/>
+                <MenuItem Header="Digital Modern"  Tag="DigitalModern"  Click="FaceMenuItem_Click"/>
+                <MenuItem Header="Digital Neon"    Tag="DigitalNeon"    Click="FaceMenuItem_Click"/>
+                <MenuItem Header="Digital Binary"  Tag="DigitalBinary"  Click="FaceMenuItem_Click"/>
+                <MenuItem Header="Digital Word"    Tag="DigitalWord"    Click="FaceMenuItem_Click"/>
+                <MenuItem Header="Digital Matrix"  Tag="DigitalMatrix"  Click="FaceMenuItem_Click"/>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Header="Always On Top"  x:Name="MenuAlwaysOnTop"  IsCheckable="True" Click="MenuAlwaysOnTop_Click"/>
+            <MenuItem Header="Show Seconds"   x:Name="MenuShowSeconds"  IsCheckable="True" Click="MenuShowSeconds_Click"/>
+            <MenuItem Header="24-Hour Format" x:Name="Menu24Hour"       IsCheckable="True" Click="Menu24Hour_Click"/>
+            <Separator/>
+            <MenuItem Header="Opacity" x:Name="MenuOpacity">
+                <MenuItem Header="100%" Tag="1.0"  Click="OpacityMenuItem_Click"/>
+                <MenuItem Header="75%"  Tag="0.75" Click="OpacityMenuItem_Click"/>
+                <MenuItem Header="50%"  Tag="0.5"  Click="OpacityMenuItem_Click"/>
+                <MenuItem Header="25%"  Tag="0.25" Click="OpacityMenuItem_Click"/>
+            </MenuItem>
+            <Separator/>
+            <MenuItem Header="Exit" Click="MenuExit_Click"/>
+        </ContextMenu>
+    </Window.ContextMenu>
+    <Grid>
+        <ContentControl x:Name="FaceHost"/>
+        <ResizeGrip HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                    Width="16" Height="16" Opacity="0.5"
+                    MouseLeftButtonDown="ResizeGrip_MouseLeftButtonDown"/>
+    </Grid>
+</Window>
