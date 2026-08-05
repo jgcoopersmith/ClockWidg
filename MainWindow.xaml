@@ -6,7 +6,7 @@
         AllowsTransparency="True"
         Background="Transparent"
         ResizeMode="CanResize"
-        MinWidth="120" MinHeight="120"
+        MinWidth="50" MinHeight="50"
         MouseLeftButtonDown="Window_MouseLeftButtonDown">
     <Window.ContextMenu>
         <ContextMenu x:Name="MainContextMenu">
