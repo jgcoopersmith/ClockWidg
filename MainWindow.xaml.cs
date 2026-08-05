@@ -108,18 +108,20 @@ public partial class MainWindow : Window
     {
         if (msg != WM_NCHITTEST) return IntPtr.Zero;
 
-        // lParam packs signed screen coords (physical px); low word = x, high word = y
+        // Mouse position: signed physical screen coords packed in lParam (low=x, high=y).
         long lp = lParam.ToInt64();
-        int sx = (short)(lp & 0xFFFF);
-        int sy = (short)((lp >> 16) & 0xFFFF);
+        int mx = (short)(lp & 0xFFFF);
+        int my = (short)((lp >> 16) & 0xFFFF);
 
-        Point p;
-        try { p = PointFromScreen(new Point(sx, sy)); } // -> DIPs, window-relative, DPI-aware
-        catch { return IntPtr.Zero; }
+        // Compare against the real window rectangle, in the same physical-pixel space.
+        if (!NativeMethods.GetWindowRect(hwnd, out var r)) return IntPtr.Zero;
 
-        double w = ActualWidth, h = ActualHeight, b = ResizeBorder;
-        bool left = p.X <= b, right = p.X >= w - b;
-        bool top = p.Y <= b, bottom = p.Y >= h - b;
+        // Convert the DIP grab thickness to physical pixels for the current DPI.
+        double dpi = HwndSource.FromHwnd(hwnd)?.CompositionTarget?.TransformToDevice.M11 ?? 1.0;
+        int b = (int)Math.Ceiling(ResizeBorder * dpi);
+
+        bool left = mx <= r.Left + b, right = mx >= r.Right - b;
+        bool top = my <= r.Top + b, bottom = my >= r.Bottom - b;
 
         int hit =
             top && left ? HTTOPLEFT :
