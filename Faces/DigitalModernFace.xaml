@@ -3,12 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Grid>
         <Border Background="#1e1e2e" CornerRadius="16" Margin="8">
-            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20,16">
-                <TextBlock x:Name="TimeText" FontFamily="Segoe UI Light" FontSize="52"
-                           Foreground="White" TextAlignment="Center"/>
-                <TextBlock x:Name="DateText" FontFamily="Segoe UI" FontSize="14"
-                           Foreground="#9999BB" TextAlignment="Center" Margin="0,4,0,0"/>
-            </StackPanel>
+            <Viewbox Stretch="Uniform" Margin="18,14">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock x:Name="TimeText" FontFamily="Segoe UI Light" FontSize="52"
+                               Foreground="White" TextAlignment="Center"/>
+                    <TextBlock x:Name="DateText" FontFamily="Segoe UI" FontSize="14"
+                               Foreground="#9999BB" TextAlignment="Center" Margin="0,4,0,0"/>
+                </StackPanel>
+            </Viewbox>
         </Border>
     </Grid>
 </UserControl>
