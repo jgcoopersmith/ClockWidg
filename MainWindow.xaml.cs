@@ -16,15 +16,26 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _timer = new();
     private IClockFace? _currentFace;
 
+    private ToolsWindow? _toolsWindow;
+    private DateTime _lastAlarmCheck = DateTime.Now;
+    private readonly List<(DateTime When, string Name)> _snoozes = new();
+
     public MainWindow()
     {
         InitializeComponent();
         _settings = _settingsService.Load();
         ApplySettings();
         _timer.Interval = TimeSpan.FromSeconds(1);
-        _timer.Tick += (_, _) => _currentFace?.UpdateTime(DateTime.Now, _settings.ShowSeconds, _settings.Use24Hour);
+        _timer.Tick += Timer_Tick;
         _timer.Start();
         Loaded += (_, _) => _currentFace?.UpdateTime(DateTime.Now, _settings.ShowSeconds, _settings.Use24Hour);
+    }
+
+    private void Timer_Tick(object? sender, EventArgs e)
+    {
+        DateTime now = DateTime.Now;
+        _currentFace?.UpdateTime(now, _settings.ShowSeconds, _settings.Use24Hour);
+        CheckAlarms(now);
     }
 
     private void ApplySettings()
@@ -195,6 +206,74 @@ public partial class MainWindow : Window
             NativeMethods.SendMessage(helper.Handle, 0x112, (IntPtr)0xF008, IntPtr.Zero);
         }
     }
+
+    // ---------------- Alarms ----------------
+    private void CheckAlarms(DateTime now)
+    {
+        if (now <= _lastAlarmCheck) { _lastAlarmCheck = now; return; }
+
+        bool changed = false;
+
+        foreach (var alarm in _settings.Alarms)
+        {
+            if (!alarm.Enabled) continue;
+            if (alarm.Hour is < 0 or > 23 || alarm.Minute is < 0 or > 59) continue;
+            var occ = new DateTime(now.Year, now.Month, now.Day, alarm.Hour, alarm.Minute, 0);
+            if (occ > _lastAlarmCheck && occ <= now)
+            {
+                FireAlarm(alarm.Name, FormatAlarmTime(alarm.Hour, alarm.Minute));
+                if (!alarm.Repeat) { alarm.Enabled = false; changed = true; }
+            }
+        }
+
+        for (int i = _snoozes.Count - 1; i >= 0; i--)
+        {
+            if (_snoozes[i].When > _lastAlarmCheck && _snoozes[i].When <= now)
+            {
+                FireAlarm(_snoozes[i].Name, FormatAlarmTime(now.Hour, now.Minute));
+                _snoozes.RemoveAt(i);
+            }
+        }
+
+        _lastAlarmCheck = now;
+        if (changed) SaveSettings();
+    }
+
+    private void FireAlarm(string name, string timeText)
+    {
+        var safeName = string.IsNullOrWhiteSpace(name) ? "Alarm" : name;
+        var ring = new AlarmRingWindow(safeName, timeText);
+        ring.SnoozeRequested += minutes => _snoozes.Add((DateTime.Now.AddMinutes(minutes), safeName));
+        ring.Show();
+    }
+
+    private string FormatAlarmTime(int hour, int minute)
+    {
+        var dt = new DateTime(2000, 1, 1, hour, minute, 0);
+        return dt.ToString(_settings.Use24Hour ? "HH:mm" : "h:mm tt");
+    }
+
+    // ---------------- Tools window ----------------
+    private void OpenTools(string tab)
+    {
+        if (_toolsWindow == null)
+        {
+            _toolsWindow = new ToolsWindow(_settings, SaveSettings);
+            _toolsWindow.Closed += (_, _) => _toolsWindow = null;
+            _toolsWindow.Show();
+        }
+        else
+        {
+            if (_toolsWindow.WindowState == WindowState.Minimized)
+                _toolsWindow.WindowState = WindowState.Normal;
+            _toolsWindow.Activate();
+        }
+        _toolsWindow.ShowTab(tab);
+    }
+
+    private void MenuAlarms_Click(object sender, RoutedEventArgs e) => OpenTools("Alarms");
+    private void MenuStopwatch_Click(object sender, RoutedEventArgs e) => OpenTools("Stopwatch");
+    private void MenuTimer_Click(object sender, RoutedEventArgs e) => OpenTools("Timer");
 
     private void MenuExit_Click(object sender, RoutedEventArgs e)
     {

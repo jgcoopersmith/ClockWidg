@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+
 namespace ClockWidg.Models;
 
 public class ClockSettings
@@ -11,4 +13,5 @@ public class ClockSettings
     public bool ShowSeconds { get; set; } = true;
     public bool Use24Hour { get; set; } = false;
     public double WindowOpacity { get; set; } = 1.0;
+    public ObservableCollection<AlarmItem> Alarms { get; set; } = new();
 }

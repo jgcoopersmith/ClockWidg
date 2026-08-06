@@ -23,6 +23,10 @@
                 <MenuItem Header="Digital Matrix"  Tag="DigitalMatrix"  Click="FaceMenuItem_Click"/>
             </MenuItem>
             <Separator/>
+            <MenuItem Header="Alarms…"    Click="MenuAlarms_Click"/>
+            <MenuItem Header="Stopwatch…" Click="MenuStopwatch_Click"/>
+            <MenuItem Header="Timer…"     Click="MenuTimer_Click"/>
+            <Separator/>
             <MenuItem Header="Always On Top"  x:Name="MenuAlwaysOnTop"  IsCheckable="True" Click="MenuAlwaysOnTop_Click"/>
             <MenuItem Header="Show Seconds"   x:Name="MenuShowSeconds"  IsCheckable="True" Click="MenuShowSeconds_Click"/>
             <MenuItem Header="24-Hour Format" x:Name="Menu24Hour"       IsCheckable="True" Click="Menu24Hour_Click"/>
