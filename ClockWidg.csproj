@@ -7,5 +7,6 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>ClockWidg</AssemblyName>
     <RootNamespace>ClockWidg</RootNamespace>
+    <ApplicationIcon>ClockWidg.ico</ApplicationIcon>
   </PropertyGroup>
 </Project>
