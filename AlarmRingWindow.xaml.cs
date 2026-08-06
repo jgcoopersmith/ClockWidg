@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input;
 using ClockWidg.Services;
 
 namespace ClockWidg;
@@ -30,6 +31,11 @@ public partial class AlarmRingWindow : Window
     }
 
     private void Dismiss_Click(object sender, RoutedEventArgs e) => Close();
+
+    private void Content_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ButtonState == MouseButtonState.Pressed) DragMove();
+    }
 
     private void Window_Closed(object sender, EventArgs e) => _sound.Dispose();
 }

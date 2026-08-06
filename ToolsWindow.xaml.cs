@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Threading;
 using ClockWidg.Models;
 using ClockWidg.Services;
@@ -40,18 +41,26 @@ public partial class ToolsWindow : Window
         _swTimer.Tick += (_, _) => SwDisplay.Text = Format(_sw.Elapsed);
         _tmTimer.Tick += TmTimer_Tick;
 
+        ResizeHook.Attach(this);
         UpdateEmptyState();
     }
 
     public void ShowTab(string tab)
     {
-        Tabs.SelectedIndex = tab switch
+        switch (tab)
         {
-            "Stopwatch" => 1,
-            "Timer" => 2,
-            _ => 0,
-        };
+            case "Stopwatch": RbStopwatch.IsChecked = true; break;
+            case "Timer": RbTimer.IsChecked = true; break;
+            default: RbAlarms.IsChecked = true; break;
+        }
     }
+
+    private void Header_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ButtonState == MouseButtonState.Pressed) DragMove();
+    }
+
+    private void Close_Click(object sender, RoutedEventArgs e) => Close();
 
     // ---------------- Alarms ----------------
     private void AddAlarm_Click(object sender, RoutedEventArgs e)
