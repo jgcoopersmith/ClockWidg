@@ -4,7 +4,7 @@
         Title="ClockWidg"
         WindowStyle="None"
         AllowsTransparency="True"
-        Background="Transparent"
+        Background="#01000000"
         ResizeMode="CanResize"
         MinWidth="50" MinHeight="50"
         MouseLeftButtonDown="Window_MouseLeftButtonDown">

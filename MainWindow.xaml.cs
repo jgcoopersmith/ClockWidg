@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -103,10 +104,11 @@ public partial class MainWindow : Window
 
     // ---- Borderless-window resize via native hit-testing ----
     private const int WM_NCHITTEST = 0x0084;
+    private const int WM_GETMINMAXINFO = 0x0024;
     private const int HTCLIENT = 1;
     private const int HTLEFT = 10, HTRIGHT = 11, HTTOP = 12, HTTOPLEFT = 13,
                       HTTOPRIGHT = 14, HTBOTTOM = 15, HTBOTTOMLEFT = 16, HTBOTTOMRIGHT = 17;
-    private const double ResizeBorder = 8.0; // grab thickness in DIPs
+    private const double ResizeBorder = 10.0; // grab thickness in DIPs
 
     protected override void OnSourceInitialized(EventArgs e)
     {
@@ -117,6 +119,26 @@ public partial class MainWindow : Window
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
     {
+        // Lift the default max-resize cap (~monitor size) so the widget can be
+        // dragged much larger, up to the full virtual desktop across monitors.
+        if (msg == WM_GETMINMAXINFO)
+        {
+            var mmi = Marshal.PtrToStructure<NativeMethods.MINMAXINFO>(lParam);
+            int vw = NativeMethods.GetSystemMetrics(NativeMethods.SM_CXVIRTUALSCREEN);
+            int vh = NativeMethods.GetSystemMetrics(NativeMethods.SM_CYVIRTUALSCREEN);
+            if (vw > 0 && vh > 0)
+            {
+                mmi.ptMaxTrackSize.X = vw;
+                mmi.ptMaxTrackSize.Y = vh;
+            }
+            double minDpi = HwndSource.FromHwnd(hwnd)?.CompositionTarget?.TransformToDevice.M11 ?? 1.0;
+            mmi.ptMinTrackSize.X = (int)(MinWidth * minDpi);
+            mmi.ptMinTrackSize.Y = (int)(MinHeight * minDpi);
+            Marshal.StructureToPtr(mmi, lParam, false);
+            handled = true;
+            return IntPtr.Zero;
+        }
+
         if (msg != WM_NCHITTEST) return IntPtr.Zero;
 
         // Mouse position: signed physical screen coords packed in lParam (low=x, high=y).
