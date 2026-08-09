@@ -28,6 +28,7 @@ public partial class AnalogMinimalFace : UserControl, IClockFace
         if (w <= 0 || h <= 0) return;
         double cx = w / 2, cy = h / 2;
         double radius = Math.Min(cx, cy) * 0.88;
+        double s = Math.Max(1.0, radius / 110.0); // stroke scale (1.0 at default size)
 
         // 12 hour dots
         var dotBrush = new SolidColorBrush(Color.FromRgb(200, 200, 220));
@@ -35,7 +36,7 @@ public partial class AnalogMinimalFace : UserControl, IClockFace
         {
             double angle = i * 30.0;
             var (dx, dy) = HandPoint(cx, cy, radius * 0.88, angle);
-            double dotR = i % 3 == 0 ? 4.5 : 2.5;
+            double dotR = (i % 3 == 0 ? 4.5 : 2.5) * s;
             ClockCanvas.Children.Add(MakeEllipse(dx, dy, dotR, dotBrush));
         }
 
@@ -43,12 +44,12 @@ public partial class AnalogMinimalFace : UserControl, IClockFace
         var silverBrush = new SolidColorBrush(Color.FromRgb(180, 180, 200));
         double hourAngle = (_time.Hour % 12) * 30.0 + _time.Minute * 0.5;
         var (hx, hy) = HandPoint(cx, cy, radius * 0.55, hourAngle);
-        ClockCanvas.Children.Add(MakeLine(cx, cy, hx, hy, silverBrush, 3));
+        ClockCanvas.Children.Add(MakeLine(cx, cy, hx, hy, silverBrush, 3 * s));
 
         // Minute hand
         double minAngle = _time.Minute * 6.0 + _time.Second * 0.1;
         var (mx, my) = HandPoint(cx, cy, radius * 0.80, minAngle);
-        ClockCanvas.Children.Add(MakeLine(cx, cy, mx, my, silverBrush, 2));
+        ClockCanvas.Children.Add(MakeLine(cx, cy, mx, my, silverBrush, 2 * s));
 
         // Second hand
         if (_showSeconds)
@@ -56,11 +57,11 @@ public partial class AnalogMinimalFace : UserControl, IClockFace
             double secAngle = _time.Second * 6.0;
             var (sx, sy) = HandPoint(cx, cy, radius * 0.85, secAngle);
             var (stx, sty) = HandPoint(cx, cy, -radius * 0.15, secAngle);
-            ClockCanvas.Children.Add(MakeLine(stx, sty, sx, sy, Brushes.Red, 1));
+            ClockCanvas.Children.Add(MakeLine(stx, sty, sx, sy, Brushes.Red, 1 * s));
         }
 
         // Center dot
-        ClockCanvas.Children.Add(MakeEllipse(cx, cy, 4, silverBrush));
+        ClockCanvas.Children.Add(MakeEllipse(cx, cy, 4 * s, silverBrush));
     }
 
     private static (double x, double y) HandPoint(double cx, double cy, double r, double angleDeg)

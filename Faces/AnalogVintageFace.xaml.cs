@@ -31,14 +31,15 @@ public partial class AnalogVintageFace : UserControl, IClockFace
         if (w <= 0 || h <= 0) return;
         double cx = w / 2, cy = h / 2;
         double radius = Math.Min(cx, cy) * 0.9;
+        double s = Math.Max(1.0, radius / 112.0); // stroke scale (1.0 at default size)
 
         var creamBrush = new SolidColorBrush(Color.FromRgb(245, 240, 224));
         var brownBrush = new SolidColorBrush(Color.FromRgb(90, 50, 20));
         var darkBrown = new SolidColorBrush(Color.FromRgb(60, 30, 10));
 
         // Face - cream with double ring
-        ClockCanvas.Children.Add(MakeEllipse(cx, cy, radius, creamBrush, brownBrush, 3));
-        ClockCanvas.Children.Add(MakeEllipse(cx, cy, radius * 0.95, null, brownBrush, 1));
+        ClockCanvas.Children.Add(MakeEllipse(cx, cy, radius, creamBrush, brownBrush, 3 * s));
+        ClockCanvas.Children.Add(MakeEllipse(cx, cy, radius * 0.95, null, brownBrush, 1 * s));
 
         // Tick marks
         for (int i = 0; i < 60; i++)
@@ -48,7 +49,7 @@ public partial class AnalogVintageFace : UserControl, IClockFace
             double inner = radius * (isHour ? 0.82 : 0.90);
             var (x1, y1) = HandPoint(cx, cy, inner, angle);
             var (x2, y2) = HandPoint(cx, cy, radius * 0.93, angle);
-            ClockCanvas.Children.Add(MakeLine(x1, y1, x2, y2, brownBrush, isHour ? 2 : 0.8));
+            ClockCanvas.Children.Add(MakeLine(x1, y1, x2, y2, brownBrush, (isHour ? 2 : 0.8) * s));
         }
 
         // Roman numerals - all 12
@@ -75,12 +76,12 @@ public partial class AnalogVintageFace : UserControl, IClockFace
         // Hour hand - thick brown
         double hourAngle = (_time.Hour % 12) * 30.0 + _time.Minute * 0.5;
         var (hx, hy) = HandPoint(cx, cy, radius * 0.52, hourAngle);
-        ClockCanvas.Children.Add(MakeLine(cx, cy, hx, hy, darkBrown, 5));
+        ClockCanvas.Children.Add(MakeLine(cx, cy, hx, hy, darkBrown, 5 * s));
 
         // Minute hand
         double minAngle = _time.Minute * 6.0 + _time.Second * 0.1;
         var (mx, my) = HandPoint(cx, cy, radius * 0.76, minAngle);
-        ClockCanvas.Children.Add(MakeLine(cx, cy, mx, my, darkBrown, 3.5));
+        ClockCanvas.Children.Add(MakeLine(cx, cy, mx, my, darkBrown, 3.5 * s));
 
         // Second hand
         if (_showSeconds)
@@ -89,12 +90,12 @@ public partial class AnalogVintageFace : UserControl, IClockFace
             var (sx, sy) = HandPoint(cx, cy, radius * 0.82, secAngle);
             var (stx, sty) = HandPoint(cx, cy, -radius * 0.18, secAngle);
             var sepiaRed = new SolidColorBrush(Color.FromRgb(160, 60, 20));
-            ClockCanvas.Children.Add(MakeLine(stx, sty, sx, sy, sepiaRed, 1.2));
+            ClockCanvas.Children.Add(MakeLine(stx, sty, sx, sy, sepiaRed, 1.2 * s));
         }
 
         // Center pin
-        ClockCanvas.Children.Add(MakeEllipse(cx, cy, 6, brownBrush));
-        ClockCanvas.Children.Add(MakeEllipse(cx, cy, 3, creamBrush));
+        ClockCanvas.Children.Add(MakeEllipse(cx, cy, 6 * s, brownBrush));
+        ClockCanvas.Children.Add(MakeEllipse(cx, cy, 3 * s, creamBrush));
     }
 
     private static (double x, double y) HandPoint(double cx, double cy, double r, double angleDeg)
