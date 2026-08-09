@@ -1,5 +1,6 @@
 using System.Windows.Controls;
 using System.Windows.Media;
+using ClockWidg.Models;
 
 namespace ClockWidg.Faces;
 
@@ -7,12 +8,22 @@ public partial class DigitalModernFace : UserControl, IClockFace
 {
     private readonly Brush _defaultTimeBrush;
     private readonly Brush _defaultDateBrush;
+    private readonly FontDefaults _timeFont;
+    private readonly FontDefaults _dateFont;
 
     public DigitalModernFace()
     {
         InitializeComponent();
         _defaultTimeBrush = TimeText.Foreground;
         _defaultDateBrush = DateText.Foreground;
+        _timeFont = FontDefaults.From(TimeText);
+        _dateFont = FontDefaults.From(DateText);
+    }
+
+    public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont)
+    {
+        _timeFont.ApplyTo(TimeText, timeFont);
+        _dateFont.ApplyTo(DateText, dateFont);
     }
 
     public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour)

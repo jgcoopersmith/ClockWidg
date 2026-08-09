@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Shapes;
+using ClockWidg.Models;
 
 namespace ClockWidg.Faces;
 
@@ -20,6 +21,9 @@ public partial class AnalogNeonFace : UserControl, IClockFace
         _time = time; _showSeconds = showSeconds; _use24Hour = use24Hour;
         Redraw();
     }
+
+    // This face draws no text at all, so no font applies.
+    public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont) { }
 
     // Analog faces show no date, so only the hands take a colour.
     public void ApplyColors(Color? timeColor, Color? dateColor)

@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using ClockWidg.Models;
 
 namespace ClockWidg.Faces;
 
@@ -18,6 +19,10 @@ public partial class DigitalBinaryFace : UserControl, IClockFace
         _time = time; _showSeconds = showSeconds;
         Redraw();
     }
+
+    // The lit dots are the readout and the H/M/S labels are sized from the
+    // widget geometry, so there is no font to apply.
+    public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont) { }
 
     // The whole face is the time readout, so dateColor has nothing to apply to.
     public void ApplyColors(Color? timeColor, Color? dateColor)

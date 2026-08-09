@@ -80,6 +80,63 @@ public partial class MainWindow : Window
         FaceHost.Content = face;
         _settings.FaceName = faceName;
         ApplyFaceColors();
+        ApplyFaceFonts();
+    }
+
+    // ---------------- Fonts ----------------
+    // WPF sizes text in DIPs (1/96"), the font picker in points (1/72").
+    private const double PointsToDips = 96.0 / 72.0;
+
+    private void ApplyFaceFonts() => _currentFace?.ApplyFonts(_settings.TimeFont, _settings.DateFont);
+
+    private void MenuTimeFont_Click(object sender, RoutedEventArgs e) => PickFont(forTime: true);
+
+    private void MenuDateFont_Click(object sender, RoutedEventArgs e) => PickFont(forTime: false);
+
+    private void PickFont(bool forTime)
+    {
+        using var dlg = new System.Windows.Forms.FontDialog
+        {
+            ShowEffects = false,   // underline/strikeout/colour aren't applied here
+            FontMustExist = true,
+            MinSize = 6,
+            MaxSize = 200,
+        };
+
+        var current = forTime ? _settings.TimeFont : _settings.DateFont;
+        if (current != null)
+        {
+            var style = System.Drawing.FontStyle.Regular;
+            if (current.Bold) style |= System.Drawing.FontStyle.Bold;
+            if (current.Italic) style |= System.Drawing.FontStyle.Italic;
+            try
+            {
+                dlg.Font = new System.Drawing.Font(current.Family, (float)(current.Size / PointsToDips), style);
+            }
+            catch { /* family no longer installed — let the dialog open on its default */ }
+        }
+
+        if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+
+        var choice = new FontChoice
+        {
+            Family = dlg.Font.Name,
+            Size = dlg.Font.SizeInPoints * PointsToDips,
+            Bold = dlg.Font.Bold,
+            Italic = dlg.Font.Italic,
+        };
+        if (forTime) _settings.TimeFont = choice; else _settings.DateFont = choice;
+
+        ApplyFaceFonts();
+        SaveSettings();
+    }
+
+    private void MenuResetFonts_Click(object sender, RoutedEventArgs e)
+    {
+        _settings.TimeFont = null;
+        _settings.DateFont = null;
+        ApplyFaceFonts();
+        SaveSettings();
     }
 
     // ---------------- Colours ----------------

@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
+using ClockWidg.Models;
 
 namespace ClockWidg.Faces;
 
@@ -16,6 +17,9 @@ public partial class DigitalMatrixFace : UserControl, IClockFace
     private readonly Brush _defaultTimeBrush;
     private readonly Brush _defaultDateBrush;
     private readonly Brush _defaultYearBrush;
+    private readonly FontDefaults _timeFont;
+    private readonly FontDefaults _dateFont;
+    private readonly FontDefaults _yearFont;
 
     public DigitalMatrixFace()
     {
@@ -23,6 +27,16 @@ public partial class DigitalMatrixFace : UserControl, IClockFace
         _defaultTimeBrush = Line1.Foreground;
         _defaultDateBrush = Line2.Foreground;
         _defaultYearBrush = Line3.Foreground;
+        _timeFont = FontDefaults.From(Line1);
+        _dateFont = FontDefaults.From(Line2);
+        _yearFont = FontDefaults.From(Line3);
+    }
+
+    public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont)
+    {
+        _timeFont.ApplyTo(Line1, timeFont);
+        _dateFont.ApplyTo(Line2, dateFont);
+        _yearFont.ApplyTo(Line3, dateFont);
     }
 
     // Line2 (day/month) and Line3 (year) are both part of the date.

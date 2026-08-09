@@ -37,6 +37,12 @@
                 <MenuItem Header="50%"  Tag="0.5"  Click="OpacityMenuItem_Click"/>
                 <MenuItem Header="25%"  Tag="0.25" Click="OpacityMenuItem_Click"/>
             </MenuItem>
+            <MenuItem Header="Font" x:Name="MenuFont">
+                <MenuItem Header="Time Font…" Click="MenuTimeFont_Click"/>
+                <MenuItem Header="Date Font…" Click="MenuDateFont_Click"/>
+                <Separator/>
+                <MenuItem Header="Use Face Defaults" Click="MenuResetFonts_Click"/>
+            </MenuItem>
             <MenuItem Header="Colors" x:Name="MenuColors">
                 <MenuItem Header="Time Color…" Click="MenuTimeColor_Click"/>
                 <MenuItem Header="Date Color…" Click="MenuDateColor_Click"/>

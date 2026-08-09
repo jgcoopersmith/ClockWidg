@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
+using ClockWidg.Models;
 
 namespace ClockWidg.Faces;
 
@@ -14,12 +15,22 @@ public partial class DigitalNeonFace : UserControl, IClockFace
     private readonly Brush _defaultDateBrush;
     private Color? _timeColor;
     private Color? _dateColor;
+    private readonly FontDefaults _timeFont;
+    private readonly FontDefaults _dateFont;
 
     public DigitalNeonFace()
     {
         InitializeComponent();
         _defaultTimeBrush = TimeText.Foreground;
         _defaultDateBrush = DateText.Foreground;
+        _timeFont = FontDefaults.From(TimeText);
+        _dateFont = FontDefaults.From(DateText);
+    }
+
+    public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont)
+    {
+        _timeFont.ApplyTo(TimeText, timeFont);
+        _dateFont.ApplyTo(DateText, dateFont);
     }
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)

@@ -1,5 +1,6 @@
 using System.Windows.Controls;
 using System.Windows.Media;
+using ClockWidg.Models;
 
 namespace ClockWidg.Faces;
 
@@ -19,11 +20,28 @@ public partial class DigitalWordFace : UserControl, IClockFace
     };
 
     private readonly Brush _defaultTimeBrush;
+    private readonly FontDefaults _timeFont;
+    private readonly double _defaultLineHeight;
+    private readonly double _lineHeightRatio;
 
     public DigitalWordFace()
     {
         InitializeComponent();
         _defaultTimeBrush = WordText.Foreground;
+        _timeFont = FontDefaults.From(WordText);
+        _defaultLineHeight = WordText.LineHeight;
+        _lineHeightRatio = WordText.LineHeight / WordText.FontSize;
+    }
+
+    // This face shows no date, so dateFont has nothing to apply to.
+    public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont)
+    {
+        _timeFont.ApplyTo(WordText, timeFont);
+        // The line height is fixed in XAML, so scale it with the chosen size
+        // or the three lines would overlap.
+        WordText.LineHeight = timeFont is null || timeFont.Size <= 0
+            ? _defaultLineHeight
+            : timeFont.Size * _lineHeightRatio;
     }
 
     public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour)
