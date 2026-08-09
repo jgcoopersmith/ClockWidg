@@ -42,10 +42,11 @@ public partial class DigitalMatrixFace : UserControl, IClockFace
     }
 
     // Line2 (day/month) and Line3 (year) are both part of the date.
-    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor, double backgroundOpacity)
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor, double backgroundOpacity, double textOpacity)
     {
         Line1.Foreground = timeColor is Color t ? new SolidColorBrush(t) : _defaultTimeBrush;
         Panel.Background = FaceBrush.Background(backgroundColor, _defaultPanelBrush, backgroundOpacity);
+        Line1.Opacity = Line2.Opacity = Line3.Opacity = textOpacity;
         if (dateColor is Color d)
         {
             Line2.Foreground = new SolidColorBrush(d);

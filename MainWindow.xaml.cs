@@ -145,7 +145,8 @@ public partial class MainWindow : Window
             ParseColor(_settings.TimeColor),
             ParseColor(_settings.DateColor),
             ParseColor(_settings.BackgroundColor),
-            _settings.BackgroundOpacity);
+            _settings.BackgroundOpacity,
+            _settings.TextOpacity);
 
     private static System.Windows.Media.Color? ParseColor(string? hex)
     {
@@ -346,6 +347,14 @@ public partial class MainWindow : Window
     {
         var item = (MenuItem)sender;
         _settings.BackgroundOpacity = double.Parse((string)item.Tag, System.Globalization.CultureInfo.InvariantCulture);
+        ApplyFaceColors();
+        SaveSettings();
+    }
+
+    private void TextOpacityMenuItem_Click(object sender, RoutedEventArgs e)
+    {
+        var item = (MenuItem)sender;
+        _settings.TextOpacity = double.Parse((string)item.Tag, System.Globalization.CultureInfo.InvariantCulture);
         ApplyFaceColors();
         SaveSettings();
     }

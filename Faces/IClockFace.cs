@@ -13,9 +13,12 @@ public interface IClockFace
     /// <paramref name="backgroundColor"/> fills whatever each face treats as its
     /// backdrop — the rounded panel on the digital faces, the dial on the analog ones —
     /// and <paramref name="backgroundOpacity"/> fades that backdrop alone, leaving the
-    /// time and date drawn on top fully opaque.
+    /// time and date drawn on top fully opaque. <paramref name="textOpacity"/> fades
+    /// that time and date text; faces with no text (the analog faces, and Digital
+    /// Binary) ignore it.
     /// </summary>
-    void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor, double backgroundOpacity);
+    void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor,
+                     double backgroundOpacity, double textOpacity);
 
     /// <summary>
     /// Applies user-chosen fonts. A null choice means "use this face's own default".

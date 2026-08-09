@@ -37,10 +37,12 @@ public partial class DigitalLcdFace : UserControl, IClockFace
         DateText.Text = time.ToString("ddd MMM dd  yyyy").ToUpper();
     }
 
-    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor, double backgroundOpacity)
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor, double backgroundOpacity, double textOpacity)
     {
         TimeText.Foreground = timeColor is Color t ? new SolidColorBrush(t) : _defaultTimeBrush;
         DateText.Foreground = dateColor is Color d ? new SolidColorBrush(d) : _defaultDateBrush;
         Panel.Background = FaceBrush.Background(backgroundColor, _defaultPanelBrush, backgroundOpacity);
+        TimeText.Opacity = textOpacity;
+        DateText.Opacity = textOpacity;
     }
 }

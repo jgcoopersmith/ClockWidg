@@ -30,7 +30,7 @@ public partial class AnalogMinimalFace : UserControl, IClockFace
     public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont) { }
 
     // Analog faces show no date, so only the hands take a colour.
-    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor, double backgroundOpacity)
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor, double backgroundOpacity, double textOpacity)
     {
         _timeColor = timeColor;
         ClockCanvas.Background = FaceBrush.Background(backgroundColor, _defaultBackground, backgroundOpacity);

@@ -62,12 +62,15 @@ public partial class DigitalNeonFace : UserControl, IClockFace
         DateText.Text = time.ToString("ddd  MMM dd  yyyy").ToUpper();
     }
 
-    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor, double backgroundOpacity)
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor, double backgroundOpacity, double textOpacity)
     {
         _timeColor = timeColor;
         _dateColor = dateColor;
 
         Panel.Background = FaceBrush.Background(backgroundColor, _defaultPanelBrush, backgroundOpacity);
+        // Element opacity here, so the neon glow fades with the text it belongs to.
+        TimeText.Opacity = textOpacity;
+        DateText.Opacity = textOpacity;
 
         TimeText.Foreground = timeColor is Color t ? new SolidColorBrush(t) : _defaultTimeBrush;
         DateText.Foreground = dateColor is Color d ? new SolidColorBrush(d) : _defaultDateBrush;
