@@ -17,6 +17,8 @@ public class ClockSettings
     public string? TimeColor { get; set; }
     public string? DateColor { get; set; }
     public string? BackgroundColor { get; set; }
+    // Fades only the backdrop; WindowOpacity fades the whole widget.
+    public double BackgroundOpacity { get; set; } = 1.0;
     // null to use the current face's own default font.
     public FontChoice? TimeFont { get; set; }
     public FontChoice? DateFont { get; set; }

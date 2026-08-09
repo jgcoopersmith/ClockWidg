@@ -37,6 +37,13 @@
                 <MenuItem Header="50%"  Tag="0.5"  Click="OpacityMenuItem_Click"/>
                 <MenuItem Header="25%"  Tag="0.25" Click="OpacityMenuItem_Click"/>
             </MenuItem>
+            <MenuItem Header="Background Opacity" x:Name="MenuBackgroundOpacity">
+                <MenuItem Header="100%" Tag="1.0"  Click="BackgroundOpacityMenuItem_Click"/>
+                <MenuItem Header="75%"  Tag="0.75" Click="BackgroundOpacityMenuItem_Click"/>
+                <MenuItem Header="50%"  Tag="0.5"  Click="BackgroundOpacityMenuItem_Click"/>
+                <MenuItem Header="25%"  Tag="0.25" Click="BackgroundOpacityMenuItem_Click"/>
+                <MenuItem Header="0%"   Tag="0.0"  Click="BackgroundOpacityMenuItem_Click"/>
+            </MenuItem>
             <MenuItem Header="Font" x:Name="MenuFont">
                 <MenuItem Header="Time Font…" Click="MenuTimeFont_Click"/>
                 <MenuItem Header="Date Font…" Click="MenuDateFont_Click"/>

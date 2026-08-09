@@ -30,10 +30,10 @@ public partial class DigitalBinaryFace : UserControl, IClockFace
     public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont) { }
 
     // The whole face is the time readout, so dateColor has nothing to apply to.
-    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor)
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor, double backgroundOpacity)
     {
         _timeColor = timeColor;
-        Panel.Background = backgroundColor is Color b ? new SolidColorBrush(b) : _defaultPanelBrush;
+        Panel.Background = FaceBrush.Background(backgroundColor, _defaultPanelBrush, backgroundOpacity);
         Redraw();
     }
 

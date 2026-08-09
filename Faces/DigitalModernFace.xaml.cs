@@ -37,10 +37,10 @@ public partial class DigitalModernFace : UserControl, IClockFace
         DateText.Text = time.ToString("dddd, MMMM d");
     }
 
-    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor)
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor, double backgroundOpacity)
     {
         TimeText.Foreground = timeColor is Color t ? new SolidColorBrush(t) : _defaultTimeBrush;
         DateText.Foreground = dateColor is Color d ? new SolidColorBrush(d) : _defaultDateBrush;
-        Panel.Background = backgroundColor is Color b ? new SolidColorBrush(b) : _defaultPanelBrush;
+        Panel.Background = FaceBrush.Background(backgroundColor, _defaultPanelBrush, backgroundOpacity);
     }
 }

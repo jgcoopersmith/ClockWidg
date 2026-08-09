@@ -52,10 +52,10 @@ public partial class DigitalWordFace : UserControl, IClockFace
     }
 
     // This face shows no date, so dateColor has nothing to apply to.
-    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor)
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor, double backgroundOpacity)
     {
         WordText.Foreground = timeColor is Color t ? new SolidColorBrush(t) : _defaultTimeBrush;
-        Panel.Background = backgroundColor is Color b ? new SolidColorBrush(b) : _defaultPanelBrush;
+        Panel.Background = FaceBrush.Background(backgroundColor, _defaultPanelBrush, backgroundOpacity);
     }
 
     private static string ToWords(DateTime time)

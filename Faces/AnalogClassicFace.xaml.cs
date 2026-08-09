@@ -13,6 +13,7 @@ public partial class AnalogClassicFace : UserControl, IClockFace
     private bool _use24Hour = false;
     private Color? _timeColor;
     private Color? _backgroundColor;
+    private double _backgroundOpacity = 1.0;
 
     public AnalogClassicFace() { InitializeComponent(); }
 
@@ -27,10 +28,11 @@ public partial class AnalogClassicFace : UserControl, IClockFace
 
     // Analog faces show no date, so only the hands take a colour. The dial is
     // this face's backdrop, so the background colour fills it.
-    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor)
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor, double backgroundOpacity)
     {
         _timeColor = timeColor;
         _backgroundColor = backgroundColor;
+        _backgroundOpacity = backgroundOpacity;
         Redraw();
     }
 
@@ -46,7 +48,7 @@ public partial class AnalogClassicFace : UserControl, IClockFace
         double s = Math.Max(1.0, radius / 112.0); // stroke scale (1.0 at default size)
 
         // Face
-        Brush dialBrush = _backgroundColor is Color bg ? new SolidColorBrush(bg) : Brushes.White;
+        Brush dialBrush = FaceBrush.Background(_backgroundColor, Brushes.White, _backgroundOpacity)!;
         ClockCanvas.Children.Add(MakeEllipse(cx, cy, radius, dialBrush, Brushes.Black, 2 * s));
 
         // Tick marks
