@@ -7,20 +7,33 @@ namespace ClockWidg.Faces;
 
 public partial class DigitalNeonFace : UserControl, IClockFace
 {
-    public DigitalNeonFace() { InitializeComponent(); }
+    private static readonly Color DefaultTimeGlow = Colors.Cyan;
+    private static readonly Color DefaultDateGlow = Colors.Magenta;
+
+    private readonly Brush _defaultTimeBrush;
+    private readonly Brush _defaultDateBrush;
+    private Color? _timeColor;
+    private Color? _dateColor;
+
+    public DigitalNeonFace()
+    {
+        InitializeComponent();
+        _defaultTimeBrush = TimeText.Foreground;
+        _defaultDateBrush = DateText.Foreground;
+    }
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {
         TimeText.Effect = new DropShadowEffect
         {
-            Color = Colors.Cyan,
+            Color = _timeColor ?? DefaultTimeGlow,
             BlurRadius = 20,
             ShadowDepth = 0,
             Opacity = 1
         };
         DateText.Effect = new DropShadowEffect
         {
-            Color = Colors.Magenta,
+            Color = _dateColor ?? DefaultDateGlow,
             BlurRadius = 16,
             ShadowDepth = 0,
             Opacity = 1
@@ -34,5 +47,20 @@ public partial class DigitalNeonFace : UserControl, IClockFace
             : (showSeconds ? "hh:mm:ss" : "hh:mm");
         TimeText.Text = time.ToString(fmt);
         DateText.Text = time.ToString("ddd  MMM dd  yyyy").ToUpper();
+    }
+
+    public void ApplyColors(Color? timeColor, Color? dateColor)
+    {
+        _timeColor = timeColor;
+        _dateColor = dateColor;
+
+        TimeText.Foreground = timeColor is Color t ? new SolidColorBrush(t) : _defaultTimeBrush;
+        DateText.Foreground = dateColor is Color d ? new SolidColorBrush(d) : _defaultDateBrush;
+
+        // Keep the glow in step with the text so the neon look survives a recolour.
+        if (TimeText.Effect is DropShadowEffect timeGlow)
+            timeGlow.Color = timeColor ?? DefaultTimeGlow;
+        if (DateText.Effect is DropShadowEffect dateGlow)
+            dateGlow.Color = dateColor ?? DefaultDateGlow;
     }
 }

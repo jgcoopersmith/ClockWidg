@@ -9,12 +9,20 @@ public partial class DigitalBinaryFace : UserControl, IClockFace
 {
     private DateTime _time = DateTime.Now;
     private bool _showSeconds = true;
+    private Color? _timeColor;
 
     public DigitalBinaryFace() { InitializeComponent(); }
 
     public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour)
     {
         _time = time; _showSeconds = showSeconds;
+        Redraw();
+    }
+
+    // The whole face is the time readout, so dateColor has nothing to apply to.
+    public void ApplyColors(Color? timeColor, Color? dateColor)
+    {
+        _timeColor = timeColor;
         Redraw();
     }
 
@@ -40,9 +48,11 @@ public partial class DigitalBinaryFace : UserControl, IClockFace
         double dotSpacing = dotAreaH / (maxBits + 0.5);
         double dotR = Math.Min(dotSpacing * 0.38, colW * 0.28);
 
-        var onBrush = new SolidColorBrush(Color.FromRgb(0, 200, 80));
-        var offBrush = new SolidColorBrush(Color.FromRgb(30, 50, 30));
-        var labelBrush = new SolidColorBrush(Color.FromRgb(0, 160, 60));
+        Color on = _timeColor ?? Color.FromRgb(0, 200, 80);
+        var onBrush = new SolidColorBrush(on);
+        // Unlit bits and labels are dimmed versions of the lit colour.
+        var offBrush = new SolidColorBrush(Dim(on, 0.22));
+        var labelBrush = new SolidColorBrush(Dim(on, 0.8));
 
         for (int c = 0; c < cols; c++)
         {
@@ -88,4 +98,7 @@ public partial class DigitalBinaryFace : UserControl, IClockFace
             ClockCanvas.Children.Add(tb);
         }
     }
+
+    private static Color Dim(Color c, double factor)
+        => Color.FromRgb((byte)(c.R * factor), (byte)(c.G * factor), (byte)(c.B * factor));
 }

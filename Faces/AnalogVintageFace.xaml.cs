@@ -10,6 +10,7 @@ public partial class AnalogVintageFace : UserControl, IClockFace
     private DateTime _time = DateTime.Now;
     private bool _showSeconds = true;
     private bool _use24Hour = false;
+    private Color? _timeColor;
 
     private static readonly string[] RomanNumerals =
         { "XII", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI" };
@@ -19,6 +20,13 @@ public partial class AnalogVintageFace : UserControl, IClockFace
     public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour)
     {
         _time = time; _showSeconds = showSeconds; _use24Hour = use24Hour;
+        Redraw();
+    }
+
+    // Analog faces show no date, so only the hands take a colour.
+    public void ApplyColors(Color? timeColor, Color? dateColor)
+    {
+        _timeColor = timeColor;
         Redraw();
     }
 
@@ -35,7 +43,9 @@ public partial class AnalogVintageFace : UserControl, IClockFace
 
         var creamBrush = new SolidColorBrush(Color.FromRgb(245, 240, 224));
         var brownBrush = new SolidColorBrush(Color.FromRgb(90, 50, 20));
-        var darkBrown = new SolidColorBrush(Color.FromRgb(60, 30, 10));
+        Brush darkBrown = _timeColor is Color tc
+            ? new SolidColorBrush(tc)
+            : new SolidColorBrush(Color.FromRgb(60, 30, 10));
 
         // Face - cream with double ring
         ClockCanvas.Children.Add(MakeEllipse(cx, cy, radius, creamBrush, brownBrush, 3 * s));

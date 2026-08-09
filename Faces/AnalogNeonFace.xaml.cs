@@ -11,12 +11,20 @@ public partial class AnalogNeonFace : UserControl, IClockFace
     private DateTime _time = DateTime.Now;
     private bool _showSeconds = true;
     private bool _use24Hour = false;
+    private Color? _timeColor;
 
     public AnalogNeonFace() { InitializeComponent(); }
 
     public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour)
     {
         _time = time; _showSeconds = showSeconds; _use24Hour = use24Hour;
+        Redraw();
+    }
+
+    // Analog faces show no date, so only the hands take a colour.
+    public void ApplyColors(Color? timeColor, Color? dateColor)
+    {
+        _timeColor = timeColor;
         Redraw();
     }
 
@@ -32,7 +40,8 @@ public partial class AnalogNeonFace : UserControl, IClockFace
         double s = Math.Max(1.0, radius / 110.0); // stroke/glow scale (1.0 at default size)
 
         var cyanBrush = new SolidColorBrush(Color.FromRgb(0, 255, 255));
-        var greenBrush = new SolidColorBrush(Color.FromRgb(57, 255, 20));
+        Color handColor = _timeColor ?? Color.FromRgb(57, 255, 20);
+        var greenBrush = new SolidColorBrush(handColor);
         var magentaBrush = new SolidColorBrush(Color.FromRgb(255, 0, 255));
 
         // Outer ring
@@ -55,14 +64,14 @@ public partial class AnalogNeonFace : UserControl, IClockFace
         double hourAngle = (_time.Hour % 12) * 30.0 + _time.Minute * 0.5;
         var (hx, hy) = HandPoint(cx, cy, radius * 0.55, hourAngle);
         var hourLine = MakeLine(cx, cy, hx, hy, greenBrush, 3 * s);
-        hourLine.Effect = new DropShadowEffect { Color = Color.FromRgb(57, 255, 20), BlurRadius = 14 * s, ShadowDepth = 0, Opacity = 1 };
+        hourLine.Effect = new DropShadowEffect { Color = handColor, BlurRadius = 14 * s, ShadowDepth = 0, Opacity = 1 };
         ClockCanvas.Children.Add(hourLine);
 
         // Minute hand - neon green
         double minAngle = _time.Minute * 6.0 + _time.Second * 0.1;
         var (mx, my) = HandPoint(cx, cy, radius * 0.78, minAngle);
         var minLine = MakeLine(cx, cy, mx, my, greenBrush, 2 * s);
-        minLine.Effect = new DropShadowEffect { Color = Color.FromRgb(57, 255, 20), BlurRadius = 14 * s, ShadowDepth = 0, Opacity = 1 };
+        minLine.Effect = new DropShadowEffect { Color = handColor, BlurRadius = 14 * s, ShadowDepth = 0, Opacity = 1 };
         ClockCanvas.Children.Add(minLine);
 
         // Second hand - magenta

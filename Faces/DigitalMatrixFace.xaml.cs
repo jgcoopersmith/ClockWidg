@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace ClockWidg.Faces;
@@ -12,7 +13,34 @@ public partial class DigitalMatrixFace : UserControl, IClockFace
     private bool _showSeconds = true;
     private bool _use24Hour = false;
 
-    public DigitalMatrixFace() { InitializeComponent(); }
+    private readonly Brush _defaultTimeBrush;
+    private readonly Brush _defaultDateBrush;
+    private readonly Brush _defaultYearBrush;
+
+    public DigitalMatrixFace()
+    {
+        InitializeComponent();
+        _defaultTimeBrush = Line1.Foreground;
+        _defaultDateBrush = Line2.Foreground;
+        _defaultYearBrush = Line3.Foreground;
+    }
+
+    // Line2 (day/month) and Line3 (year) are both part of the date.
+    public void ApplyColors(Color? timeColor, Color? dateColor)
+    {
+        Line1.Foreground = timeColor is Color t ? new SolidColorBrush(t) : _defaultTimeBrush;
+        if (dateColor is Color d)
+        {
+            Line2.Foreground = new SolidColorBrush(d);
+            // Keep the year one shade dimmer, as the default palette does.
+            Line3.Foreground = new SolidColorBrush(Color.FromArgb(0xB0, d.R, d.G, d.B));
+        }
+        else
+        {
+            Line2.Foreground = _defaultDateBrush;
+            Line3.Foreground = _defaultYearBrush;
+        }
+    }
 
     private void UserControl_Loaded(object sender, RoutedEventArgs e)
     {

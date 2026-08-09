@@ -13,5 +13,8 @@ public class ClockSettings
     public bool ShowSeconds { get; set; } = true;
     public bool Use24Hour { get; set; } = false;
     public double WindowOpacity { get; set; } = 1.0;
+    // "#RRGGBB", or null to use the current face's own default colour.
+    public string? TimeColor { get; set; }
+    public string? DateColor { get; set; }
     public ObservableCollection<AlarmItem> Alarms { get; set; } = new();
 }

@@ -1,4 +1,5 @@
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace ClockWidg.Faces;
 
@@ -17,11 +18,23 @@ public partial class DigitalWordFace : UserControl, IClockFace
         "", "FIVE", "TEN", "QUARTER", "TWENTY", "TWENTY FIVE", "HALF"
     };
 
-    public DigitalWordFace() { InitializeComponent(); }
+    private readonly Brush _defaultTimeBrush;
+
+    public DigitalWordFace()
+    {
+        InitializeComponent();
+        _defaultTimeBrush = WordText.Foreground;
+    }
 
     public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour)
     {
         WordText.Text = ToWords(time);
+    }
+
+    // This face shows no date, so dateColor has nothing to apply to.
+    public void ApplyColors(Color? timeColor, Color? dateColor)
+    {
+        WordText.Foreground = timeColor is Color t ? new SolidColorBrush(t) : _defaultTimeBrush;
     }
 
     private static string ToWords(DateTime time)

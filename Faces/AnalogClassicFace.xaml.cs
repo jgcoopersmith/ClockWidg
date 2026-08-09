@@ -10,12 +10,20 @@ public partial class AnalogClassicFace : UserControl, IClockFace
     private DateTime _time = DateTime.Now;
     private bool _showSeconds = true;
     private bool _use24Hour = false;
+    private Color? _timeColor;
 
     public AnalogClassicFace() { InitializeComponent(); }
 
     public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour)
     {
         _time = time; _showSeconds = showSeconds; _use24Hour = use24Hour;
+        Redraw();
+    }
+
+    // Analog faces show no date, so only the hands take a colour.
+    public void ApplyColors(Color? timeColor, Color? dateColor)
+    {
+        _timeColor = timeColor;
         Redraw();
     }
 
@@ -65,15 +73,17 @@ public partial class AnalogClassicFace : UserControl, IClockFace
             ClockCanvas.Children.Add(tb);
         }
 
+        Brush handBrush = _timeColor is Color tc ? new SolidColorBrush(tc) : Brushes.Black;
+
         // Hour hand
         double hourAngle = (_time.Hour % 12) * 30.0 + _time.Minute * 0.5;
         var (hx, hy) = HandPoint(cx, cy, radius * 0.55, hourAngle);
-        ClockCanvas.Children.Add(MakeLine(cx, cy, hx, hy, Brushes.Black, 4 * s));
+        ClockCanvas.Children.Add(MakeLine(cx, cy, hx, hy, handBrush, 4 * s));
 
         // Minute hand
         double minAngle = _time.Minute * 6.0 + _time.Second * 0.1;
         var (mx, my) = HandPoint(cx, cy, radius * 0.80, minAngle);
-        ClockCanvas.Children.Add(MakeLine(cx, cy, mx, my, Brushes.Black, 3 * s));
+        ClockCanvas.Children.Add(MakeLine(cx, cy, mx, my, handBrush, 3 * s));
 
         // Second hand
         if (_showSeconds)
@@ -85,7 +95,7 @@ public partial class AnalogClassicFace : UserControl, IClockFace
         }
 
         // Center dot
-        ClockCanvas.Children.Add(MakeEllipse(cx, cy, 5 * s, Brushes.Black));
+        ClockCanvas.Children.Add(MakeEllipse(cx, cy, 5 * s, handBrush));
     }
 
     private static (double x, double y) HandPoint(double cx, double cy, double r, double angleDeg)

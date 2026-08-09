@@ -79,6 +79,51 @@ public partial class MainWindow : Window
         _currentFace = face as IClockFace;
         FaceHost.Content = face;
         _settings.FaceName = faceName;
+        ApplyFaceColors();
+    }
+
+    // ---------------- Colours ----------------
+    private void ApplyFaceColors()
+        => _currentFace?.ApplyColors(ParseColor(_settings.TimeColor), ParseColor(_settings.DateColor));
+
+    private static System.Windows.Media.Color? ParseColor(string? hex)
+    {
+        if (string.IsNullOrWhiteSpace(hex)) return null;
+        try
+        {
+            return (System.Windows.Media.Color)System.Windows.Media.ColorConverter.ConvertFromString(hex);
+        }
+        catch
+        {
+            return null; // fall back to the face's own default
+        }
+    }
+
+    private void MenuTimeColor_Click(object sender, RoutedEventArgs e) => PickColor(forTime: true);
+
+    private void MenuDateColor_Click(object sender, RoutedEventArgs e) => PickColor(forTime: false);
+
+    private void PickColor(bool forTime)
+    {
+        using var dlg = new System.Windows.Forms.ColorDialog { FullOpen = true, AnyColor = true };
+        if (ParseColor(forTime ? _settings.TimeColor : _settings.DateColor) is System.Windows.Media.Color c)
+            dlg.Color = System.Drawing.Color.FromArgb(c.R, c.G, c.B);
+
+        if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
+
+        string hex = $"#{dlg.Color.R:X2}{dlg.Color.G:X2}{dlg.Color.B:X2}";
+        if (forTime) _settings.TimeColor = hex; else _settings.DateColor = hex;
+
+        ApplyFaceColors();
+        SaveSettings();
+    }
+
+    private void MenuResetColors_Click(object sender, RoutedEventArgs e)
+    {
+        _settings.TimeColor = null;
+        _settings.DateColor = null;
+        ApplyFaceColors();
+        SaveSettings();
     }
 
     private void UpdateFaceMenuChecks()

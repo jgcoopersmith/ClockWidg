@@ -10,12 +10,20 @@ public partial class AnalogMinimalFace : UserControl, IClockFace
     private DateTime _time = DateTime.Now;
     private bool _showSeconds = true;
     private bool _use24Hour = false;
+    private Color? _timeColor;
 
     public AnalogMinimalFace() { InitializeComponent(); }
 
     public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour)
     {
         _time = time; _showSeconds = showSeconds; _use24Hour = use24Hour;
+        Redraw();
+    }
+
+    // Analog faces show no date, so only the hands take a colour.
+    public void ApplyColors(Color? timeColor, Color? dateColor)
+    {
+        _timeColor = timeColor;
         Redraw();
     }
 
@@ -40,8 +48,10 @@ public partial class AnalogMinimalFace : UserControl, IClockFace
             ClockCanvas.Children.Add(MakeEllipse(dx, dy, dotR, dotBrush));
         }
 
-        // Hour hand — thin silver
-        var silverBrush = new SolidColorBrush(Color.FromRgb(180, 180, 200));
+        // Hour hand — thin silver, or the user's chosen time colour
+        Brush silverBrush = _timeColor is Color tc
+            ? new SolidColorBrush(tc)
+            : new SolidColorBrush(Color.FromRgb(180, 180, 200));
         double hourAngle = (_time.Hour % 12) * 30.0 + _time.Minute * 0.5;
         var (hx, hy) = HandPoint(cx, cy, radius * 0.55, hourAngle);
         ClockCanvas.Children.Add(MakeLine(cx, cy, hx, hy, silverBrush, 3 * s));
