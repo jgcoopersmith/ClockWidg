@@ -13,6 +13,7 @@ public partial class DigitalNeonFace : UserControl, IClockFace
 
     private readonly Brush _defaultTimeBrush;
     private readonly Brush _defaultDateBrush;
+    private readonly Brush _defaultPanelBrush;
     private Color? _timeColor;
     private Color? _dateColor;
     private readonly FontDefaults _timeFont;
@@ -23,6 +24,7 @@ public partial class DigitalNeonFace : UserControl, IClockFace
         InitializeComponent();
         _defaultTimeBrush = TimeText.Foreground;
         _defaultDateBrush = DateText.Foreground;
+        _defaultPanelBrush = Panel.Background;
         _timeFont = FontDefaults.From(TimeText);
         _dateFont = FontDefaults.From(DateText);
     }
@@ -60,10 +62,12 @@ public partial class DigitalNeonFace : UserControl, IClockFace
         DateText.Text = time.ToString("ddd  MMM dd  yyyy").ToUpper();
     }
 
-    public void ApplyColors(Color? timeColor, Color? dateColor)
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor)
     {
         _timeColor = timeColor;
         _dateColor = dateColor;
+
+        Panel.Background = backgroundColor is Color b ? new SolidColorBrush(b) : _defaultPanelBrush;
 
         TimeText.Foreground = timeColor is Color t ? new SolidColorBrush(t) : _defaultTimeBrush;
         DateText.Foreground = dateColor is Color d ? new SolidColorBrush(d) : _defaultDateBrush;

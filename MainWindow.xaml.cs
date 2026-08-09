@@ -141,7 +141,10 @@ public partial class MainWindow : Window
 
     // ---------------- Colours ----------------
     private void ApplyFaceColors()
-        => _currentFace?.ApplyColors(ParseColor(_settings.TimeColor), ParseColor(_settings.DateColor));
+        => _currentFace?.ApplyColors(
+            ParseColor(_settings.TimeColor),
+            ParseColor(_settings.DateColor),
+            ParseColor(_settings.BackgroundColor));
 
     private static System.Windows.Media.Color? ParseColor(string? hex)
     {
@@ -156,20 +159,36 @@ public partial class MainWindow : Window
         }
     }
 
-    private void MenuTimeColor_Click(object sender, RoutedEventArgs e) => PickColor(forTime: true);
+    private enum ColorTarget { Time, Date, Background }
 
-    private void MenuDateColor_Click(object sender, RoutedEventArgs e) => PickColor(forTime: false);
+    private void MenuTimeColor_Click(object sender, RoutedEventArgs e) => PickColor(ColorTarget.Time);
 
-    private void PickColor(bool forTime)
+    private void MenuDateColor_Click(object sender, RoutedEventArgs e) => PickColor(ColorTarget.Date);
+
+    private void MenuBackgroundColor_Click(object sender, RoutedEventArgs e) => PickColor(ColorTarget.Background);
+
+    private void PickColor(ColorTarget target)
     {
+        string? current = target switch
+        {
+            ColorTarget.Time => _settings.TimeColor,
+            ColorTarget.Date => _settings.DateColor,
+            _                => _settings.BackgroundColor,
+        };
+
         using var dlg = new System.Windows.Forms.ColorDialog { FullOpen = true, AnyColor = true };
-        if (ParseColor(forTime ? _settings.TimeColor : _settings.DateColor) is System.Windows.Media.Color c)
+        if (ParseColor(current) is System.Windows.Media.Color c)
             dlg.Color = System.Drawing.Color.FromArgb(c.R, c.G, c.B);
 
         if (dlg.ShowDialog() != System.Windows.Forms.DialogResult.OK) return;
 
         string hex = $"#{dlg.Color.R:X2}{dlg.Color.G:X2}{dlg.Color.B:X2}";
-        if (forTime) _settings.TimeColor = hex; else _settings.DateColor = hex;
+        switch (target)
+        {
+            case ColorTarget.Time: _settings.TimeColor = hex; break;
+            case ColorTarget.Date: _settings.DateColor = hex; break;
+            default:               _settings.BackgroundColor = hex; break;
+        }
 
         ApplyFaceColors();
         SaveSettings();
@@ -179,6 +198,7 @@ public partial class MainWindow : Window
     {
         _settings.TimeColor = null;
         _settings.DateColor = null;
+        _settings.BackgroundColor = null;
         ApplyFaceColors();
         SaveSettings();
     }

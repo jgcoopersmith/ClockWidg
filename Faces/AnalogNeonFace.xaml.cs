@@ -13,8 +13,13 @@ public partial class AnalogNeonFace : UserControl, IClockFace
     private bool _showSeconds = true;
     private bool _use24Hour = false;
     private Color? _timeColor;
+    private readonly Brush _defaultBackground;
 
-    public AnalogNeonFace() { InitializeComponent(); }
+    public AnalogNeonFace()
+    {
+        InitializeComponent();
+        _defaultBackground = ClockCanvas.Background;
+    }
 
     public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour)
     {
@@ -26,9 +31,10 @@ public partial class AnalogNeonFace : UserControl, IClockFace
     public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont) { }
 
     // Analog faces show no date, so only the hands take a colour.
-    public void ApplyColors(Color? timeColor, Color? dateColor)
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor)
     {
         _timeColor = timeColor;
+        ClockCanvas.Background = backgroundColor is Color b ? new SolidColorBrush(b) : _defaultBackground;
         Redraw();
     }
 

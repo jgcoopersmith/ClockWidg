@@ -17,6 +17,7 @@ public partial class DigitalMatrixFace : UserControl, IClockFace
     private readonly Brush _defaultTimeBrush;
     private readonly Brush _defaultDateBrush;
     private readonly Brush _defaultYearBrush;
+    private readonly Brush _defaultPanelBrush;
     private readonly FontDefaults _timeFont;
     private readonly FontDefaults _dateFont;
     private readonly FontDefaults _yearFont;
@@ -27,6 +28,7 @@ public partial class DigitalMatrixFace : UserControl, IClockFace
         _defaultTimeBrush = Line1.Foreground;
         _defaultDateBrush = Line2.Foreground;
         _defaultYearBrush = Line3.Foreground;
+        _defaultPanelBrush = Panel.Background;
         _timeFont = FontDefaults.From(Line1);
         _dateFont = FontDefaults.From(Line2);
         _yearFont = FontDefaults.From(Line3);
@@ -40,9 +42,10 @@ public partial class DigitalMatrixFace : UserControl, IClockFace
     }
 
     // Line2 (day/month) and Line3 (year) are both part of the date.
-    public void ApplyColors(Color? timeColor, Color? dateColor)
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor)
     {
         Line1.Foreground = timeColor is Color t ? new SolidColorBrush(t) : _defaultTimeBrush;
+        Panel.Background = backgroundColor is Color b ? new SolidColorBrush(b) : _defaultPanelBrush;
         if (dateColor is Color d)
         {
             Line2.Foreground = new SolidColorBrush(d);

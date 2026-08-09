@@ -12,6 +12,7 @@ public partial class AnalogClassicFace : UserControl, IClockFace
     private bool _showSeconds = true;
     private bool _use24Hour = false;
     private Color? _timeColor;
+    private Color? _backgroundColor;
 
     public AnalogClassicFace() { InitializeComponent(); }
 
@@ -24,10 +25,12 @@ public partial class AnalogClassicFace : UserControl, IClockFace
     // The dial labels are furniture rather than a time readout, so no font applies.
     public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont) { }
 
-    // Analog faces show no date, so only the hands take a colour.
-    public void ApplyColors(Color? timeColor, Color? dateColor)
+    // Analog faces show no date, so only the hands take a colour. The dial is
+    // this face's backdrop, so the background colour fills it.
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor)
     {
         _timeColor = timeColor;
+        _backgroundColor = backgroundColor;
         Redraw();
     }
 
@@ -43,7 +46,8 @@ public partial class AnalogClassicFace : UserControl, IClockFace
         double s = Math.Max(1.0, radius / 112.0); // stroke scale (1.0 at default size)
 
         // Face
-        ClockCanvas.Children.Add(MakeEllipse(cx, cy, radius, Brushes.White, Brushes.Black, 2 * s));
+        Brush dialBrush = _backgroundColor is Color bg ? new SolidColorBrush(bg) : Brushes.White;
+        ClockCanvas.Children.Add(MakeEllipse(cx, cy, radius, dialBrush, Brushes.Black, 2 * s));
 
         // Tick marks
         for (int i = 0; i < 60; i++)

@@ -46,6 +46,7 @@
             <MenuItem Header="Colors" x:Name="MenuColors">
                 <MenuItem Header="Time Color…" Click="MenuTimeColor_Click"/>
                 <MenuItem Header="Date Color…" Click="MenuDateColor_Click"/>
+                <MenuItem Header="Background Color…" Click="MenuBackgroundColor_Click"/>
                 <Separator/>
                 <MenuItem Header="Use Face Defaults" Click="MenuResetColors_Click"/>
             </MenuItem>

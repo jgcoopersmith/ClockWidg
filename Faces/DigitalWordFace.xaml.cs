@@ -20,6 +20,7 @@ public partial class DigitalWordFace : UserControl, IClockFace
     };
 
     private readonly Brush _defaultTimeBrush;
+    private readonly Brush _defaultPanelBrush;
     private readonly FontDefaults _timeFont;
     private readonly double _defaultLineHeight;
     private readonly double _lineHeightRatio;
@@ -28,6 +29,7 @@ public partial class DigitalWordFace : UserControl, IClockFace
     {
         InitializeComponent();
         _defaultTimeBrush = WordText.Foreground;
+        _defaultPanelBrush = Panel.Background;
         _timeFont = FontDefaults.From(WordText);
         _defaultLineHeight = WordText.LineHeight;
         _lineHeightRatio = WordText.LineHeight / WordText.FontSize;
@@ -50,9 +52,10 @@ public partial class DigitalWordFace : UserControl, IClockFace
     }
 
     // This face shows no date, so dateColor has nothing to apply to.
-    public void ApplyColors(Color? timeColor, Color? dateColor)
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor)
     {
         WordText.Foreground = timeColor is Color t ? new SolidColorBrush(t) : _defaultTimeBrush;
+        Panel.Background = backgroundColor is Color b ? new SolidColorBrush(b) : _defaultPanelBrush;
     }
 
     private static string ToWords(DateTime time)

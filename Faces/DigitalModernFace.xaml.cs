@@ -8,6 +8,7 @@ public partial class DigitalModernFace : UserControl, IClockFace
 {
     private readonly Brush _defaultTimeBrush;
     private readonly Brush _defaultDateBrush;
+    private readonly Brush _defaultPanelBrush;
     private readonly FontDefaults _timeFont;
     private readonly FontDefaults _dateFont;
 
@@ -16,6 +17,7 @@ public partial class DigitalModernFace : UserControl, IClockFace
         InitializeComponent();
         _defaultTimeBrush = TimeText.Foreground;
         _defaultDateBrush = DateText.Foreground;
+        _defaultPanelBrush = Panel.Background;
         _timeFont = FontDefaults.From(TimeText);
         _dateFont = FontDefaults.From(DateText);
     }
@@ -35,9 +37,10 @@ public partial class DigitalModernFace : UserControl, IClockFace
         DateText.Text = time.ToString("dddd, MMMM d");
     }
 
-    public void ApplyColors(Color? timeColor, Color? dateColor)
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor)
     {
         TimeText.Foreground = timeColor is Color t ? new SolidColorBrush(t) : _defaultTimeBrush;
         DateText.Foreground = dateColor is Color d ? new SolidColorBrush(d) : _defaultDateBrush;
+        Panel.Background = backgroundColor is Color b ? new SolidColorBrush(b) : _defaultPanelBrush;
     }
 }

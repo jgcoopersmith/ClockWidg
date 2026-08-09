@@ -12,6 +12,7 @@ public partial class AnalogVintageFace : UserControl, IClockFace
     private bool _showSeconds = true;
     private bool _use24Hour = false;
     private Color? _timeColor;
+    private Color? _backgroundColor;
 
     private static readonly string[] RomanNumerals =
         { "XII", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI" };
@@ -27,10 +28,12 @@ public partial class AnalogVintageFace : UserControl, IClockFace
     // The Roman numerals are dial furniture rather than a time readout, so no font applies.
     public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont) { }
 
-    // Analog faces show no date, so only the hands take a colour.
-    public void ApplyColors(Color? timeColor, Color? dateColor)
+    // Analog faces show no date, so only the hands take a colour. The dial is
+    // this face's backdrop, so the background colour fills it.
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor)
     {
         _timeColor = timeColor;
+        _backgroundColor = backgroundColor;
         Redraw();
     }
 
@@ -52,7 +55,8 @@ public partial class AnalogVintageFace : UserControl, IClockFace
             : new SolidColorBrush(Color.FromRgb(60, 30, 10));
 
         // Face - cream with double ring
-        ClockCanvas.Children.Add(MakeEllipse(cx, cy, radius, creamBrush, brownBrush, 3 * s));
+        Brush dialBrush = _backgroundColor is Color bg ? new SolidColorBrush(bg) : creamBrush;
+        ClockCanvas.Children.Add(MakeEllipse(cx, cy, radius, dialBrush, brownBrush, 3 * s));
         ClockCanvas.Children.Add(MakeEllipse(cx, cy, radius * 0.95, null, brownBrush, 1 * s));
 
         // Tick marks

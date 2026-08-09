@@ -11,8 +11,13 @@ public partial class DigitalBinaryFace : UserControl, IClockFace
     private DateTime _time = DateTime.Now;
     private bool _showSeconds = true;
     private Color? _timeColor;
+    private readonly Brush _defaultPanelBrush;
 
-    public DigitalBinaryFace() { InitializeComponent(); }
+    public DigitalBinaryFace()
+    {
+        InitializeComponent();
+        _defaultPanelBrush = Panel.Background;
+    }
 
     public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour)
     {
@@ -25,9 +30,10 @@ public partial class DigitalBinaryFace : UserControl, IClockFace
     public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont) { }
 
     // The whole face is the time readout, so dateColor has nothing to apply to.
-    public void ApplyColors(Color? timeColor, Color? dateColor)
+    public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor)
     {
         _timeColor = timeColor;
+        Panel.Background = backgroundColor is Color b ? new SolidColorBrush(b) : _defaultPanelBrush;
         Redraw();
     }
 

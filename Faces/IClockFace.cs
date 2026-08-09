@@ -10,8 +10,10 @@ public interface IClockFace
     /// <summary>
     /// Applies user-chosen colours. A null colour means "use this face's own default".
     /// Faces that have no date element simply ignore <paramref name="dateColor"/>.
+    /// <paramref name="backgroundColor"/> fills whatever each face treats as its
+    /// backdrop — the rounded panel on the digital faces, the dial on the analog ones.
     /// </summary>
-    void ApplyColors(Color? timeColor, Color? dateColor);
+    void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor);
 
     /// <summary>
     /// Applies user-chosen fonts. A null choice means "use this face's own default".
