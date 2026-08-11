@@ -46,7 +46,7 @@ public partial class DigitalWordFace : UserControl, IClockFace
             : timeFont.Size * _lineHeightRatio;
     }
 
-    public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour)
+    public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour, bool showDate)
     {
         WordText.Text = ToWords(time);
     }

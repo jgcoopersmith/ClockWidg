@@ -21,7 +21,7 @@ public partial class AnalogNeonFace : UserControl, IClockFace
         _defaultBackground = ClockCanvas.Background;
     }
 
-    public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour)
+    public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour, bool showDate)
     {
         _time = time; _showSeconds = showSeconds; _use24Hour = use24Hour;
         Redraw();

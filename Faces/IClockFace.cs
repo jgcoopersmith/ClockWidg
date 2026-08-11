@@ -5,7 +5,7 @@ namespace ClockWidg.Faces;
 
 public interface IClockFace
 {
-    void UpdateTime(DateTime time, bool showSeconds, bool use24Hour);
+    void UpdateTime(DateTime time, bool showSeconds, bool use24Hour, bool showDate);
 
     /// <summary>
     /// Applies user-chosen colours. A null colour means "use this face's own default".

@@ -53,13 +53,14 @@ public partial class DigitalNeonFace : UserControl, IClockFace
         };
     }
 
-    public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour)
+    public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour, bool showDate)
     {
         string fmt = use24Hour
             ? (showSeconds ? "HH:mm:ss" : "HH:mm")
             : (showSeconds ? "hh:mm:ss" : "hh:mm");
         TimeText.Text = time.ToString(fmt);
         DateText.Text = time.ToString("ddd  MMM dd  yyyy").ToUpper();
+        DateText.Visibility = showDate ? Visibility.Visible : Visibility.Collapsed;
     }
 
     public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor, double backgroundOpacity, double textOpacity)

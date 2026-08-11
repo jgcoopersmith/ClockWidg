@@ -29,13 +29,13 @@ public partial class MainWindow : Window
         _timer.Interval = TimeSpan.FromSeconds(1);
         _timer.Tick += Timer_Tick;
         _timer.Start();
-        Loaded += (_, _) => _currentFace?.UpdateTime(DateTime.Now, _settings.ShowSeconds, _settings.Use24Hour);
+        Loaded += (_, _) => RefreshFace();
     }
 
     private void Timer_Tick(object? sender, EventArgs e)
     {
         DateTime now = DateTime.Now;
-        _currentFace?.UpdateTime(now, _settings.ShowSeconds, _settings.Use24Hour);
+        _currentFace?.UpdateTime(now, _settings.ShowSeconds, _settings.Use24Hour, _settings.ShowDate);
         CheckAlarms(now);
     }
 
@@ -56,6 +56,7 @@ public partial class MainWindow : Window
         Opacity = _settings.WindowOpacity;
         MenuAlwaysOnTop.IsChecked = _settings.AlwaysOnTop;
         MenuShowSeconds.IsChecked = _settings.ShowSeconds;
+        MenuShowDate.IsChecked = _settings.ShowDate;
         Menu24Hour.IsChecked = _settings.Use24Hour;
         LoadFace(_settings.FaceName);
         UpdateFaceMenuChecks();
@@ -88,6 +89,9 @@ public partial class MainWindow : Window
     private const double PointsToDips = 96.0 / 72.0;
 
     private void ApplyFaceFonts() => _currentFace?.ApplyFonts(_settings.TimeFont, _settings.DateFont);
+
+    private void RefreshFace()
+        => _currentFace?.UpdateTime(DateTime.Now, _settings.ShowSeconds, _settings.Use24Hour, _settings.ShowDate);
 
     private void MenuTimeFont_Click(object sender, RoutedEventArgs e) => PickFont(forTime: true);
 
@@ -311,7 +315,7 @@ public partial class MainWindow : Window
         LoadFace((string)item.Tag);
         UpdateFaceMenuChecks();
         SaveSettings();
-        _currentFace?.UpdateTime(DateTime.Now, _settings.ShowSeconds, _settings.Use24Hour);
+        RefreshFace();
     }
 
     private void MenuAlwaysOnTop_Click(object sender, RoutedEventArgs e)
@@ -325,14 +329,21 @@ public partial class MainWindow : Window
     {
         _settings.ShowSeconds = MenuShowSeconds.IsChecked;
         SaveSettings();
-        _currentFace?.UpdateTime(DateTime.Now, _settings.ShowSeconds, _settings.Use24Hour);
+        RefreshFace();
+    }
+
+    private void MenuShowDate_Click(object sender, RoutedEventArgs e)
+    {
+        _settings.ShowDate = MenuShowDate.IsChecked;
+        SaveSettings();
+        RefreshFace();
     }
 
     private void Menu24Hour_Click(object sender, RoutedEventArgs e)
     {
         _settings.Use24Hour = Menu24Hour.IsChecked;
         SaveSettings();
-        _currentFace?.UpdateTime(DateTime.Now, _settings.ShowSeconds, _settings.Use24Hour);
+        RefreshFace();
     }
 
     private void OpacityMenuItem_Click(object sender, RoutedEventArgs e)

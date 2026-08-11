@@ -71,7 +71,7 @@ public partial class DigitalMatrixFace : UserControl, IClockFace
         _blinkTimer.Start();
     }
 
-    public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour)
+    public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour, bool showDate)
     {
         _lastTime = time;
         _showSeconds = showSeconds;
@@ -79,6 +79,8 @@ public partial class DigitalMatrixFace : UserControl, IClockFace
         RefreshLine1();
         Line2.Text = "  " + time.ToString("ddd MMM dd").ToUpper();
         Line3.Text = "  " + time.Year.ToString();
+        // Both the day line and the year line are the date.
+        Line2.Visibility = Line3.Visibility = showDate ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void RefreshLine1()
