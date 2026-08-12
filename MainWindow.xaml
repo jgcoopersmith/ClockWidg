@@ -28,6 +28,7 @@
             <MenuItem Header="Timer…"     Click="MenuTimer_Click"/>
             <Separator/>
             <MenuItem Header="Always On Top"  x:Name="MenuAlwaysOnTop"  IsCheckable="True" Click="MenuAlwaysOnTop_Click"/>
+            <MenuItem Header="Start with Windows" x:Name="MenuStartWithWindows" IsCheckable="True" Click="MenuStartWithWindows_Click"/>
             <MenuItem Header="Show Seconds"   x:Name="MenuShowSeconds"  IsCheckable="True" Click="MenuShowSeconds_Click"/>
             <MenuItem Header="Show Date"      x:Name="MenuShowDate"     IsCheckable="True" Click="MenuShowDate_Click"/>
             <MenuItem Header="24-Hour Format" x:Name="Menu24Hour"       IsCheckable="True" Click="Menu24Hour_Click"/>

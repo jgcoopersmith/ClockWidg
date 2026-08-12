@@ -55,6 +55,9 @@ public partial class MainWindow : Window
         Topmost = _settings.AlwaysOnTop;
         Opacity = _settings.WindowOpacity;
         MenuAlwaysOnTop.IsChecked = _settings.AlwaysOnTop;
+        // The registry is the source of truth here, not settings.json.
+        StartupService.RefreshPathIfEnabled();
+        MenuStartWithWindows.IsChecked = StartupService.IsEnabled();
         MenuShowSeconds.IsChecked = _settings.ShowSeconds;
         MenuShowDate.IsChecked = _settings.ShowDate;
         Menu24Hour.IsChecked = _settings.Use24Hour;
@@ -323,6 +326,13 @@ public partial class MainWindow : Window
         _settings.AlwaysOnTop = MenuAlwaysOnTop.IsChecked;
         Topmost = _settings.AlwaysOnTop;
         SaveSettings();
+    }
+
+    private void MenuStartWithWindows_Click(object sender, RoutedEventArgs e)
+    {
+        StartupService.SetEnabled(MenuStartWithWindows.IsChecked);
+        // Reflect what actually stuck, in case the write was refused.
+        MenuStartWithWindows.IsChecked = StartupService.IsEnabled();
     }
 
     private void MenuShowSeconds_Click(object sender, RoutedEventArgs e)
