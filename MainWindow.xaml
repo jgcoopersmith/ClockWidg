@@ -65,6 +65,7 @@
                 <MenuItem Header="Use Face Defaults" Click="MenuResetColors_Click"/>
             </MenuItem>
             <Separator/>
+            <MenuItem Header="About" x:Name="MenuAbout"/>
             <MenuItem Header="Exit" Click="MenuExit_Click"/>
         </ContextMenu>
     </Window.ContextMenu>

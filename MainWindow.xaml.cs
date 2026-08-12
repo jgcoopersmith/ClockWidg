@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -82,6 +83,25 @@ public partial class MainWindow : Window
         Menu24Hour.IsChecked = _settings.Use24Hour;
         LoadFace(_settings.FaceName);
         UpdateFaceMenuChecks();
+        MenuAbout.Header = $"About - V.{AppVersion}";
+    }
+
+    /// <summary>The assembly's version, as set by &lt;Version&gt; in the csproj.</summary>
+    private static string AppVersion
+    {
+        get
+        {
+            var asm = System.Reflection.Assembly.GetExecutingAssembly();
+            string? informational = asm
+                .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
+                ?.InformationalVersion;
+
+            // The SDK can append "+<commit hash>" to the informational version.
+            if (!string.IsNullOrWhiteSpace(informational))
+                return informational.Split('+')[0];
+
+            return asm.GetName().Version?.ToString(2) ?? "1.0";
+        }
     }
 
     private void LoadFace(string faceName)

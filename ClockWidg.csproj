@@ -13,6 +13,7 @@
     <AssemblyName>ClockWidg</AssemblyName>
     <RootNamespace>ClockWidg</RootNamespace>
     <ApplicationIcon>ClockWidg.ico</ApplicationIcon>
+    <Version>1.2</Version>
   </PropertyGroup>
   <ItemGroup>
     <Using Remove="System.Drawing" />
