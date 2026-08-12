@@ -36,7 +36,26 @@ public partial class MainWindow : Window
     {
         DateTime now = DateTime.Now;
         _currentFace?.UpdateTime(now, _settings.ShowSeconds, _settings.Use24Hour, _settings.ShowDate);
+        ReassertTopmost();
         CheckAlarms(now);
+    }
+
+    /// <summary>
+    /// WPF's Topmost is set once and then quietly lost — a full-screen app, a UAC
+    /// prompt or another topmost window can demote us, and nothing puts it back.
+    /// While Always On Top is ticked, push the window back into the topmost band
+    /// each tick. SWP_NOACTIVATE means this never steals focus from what you're using.
+    /// </summary>
+    private void ReassertTopmost()
+    {
+        if (!_settings.AlwaysOnTop) return;
+
+        var hwnd = new WindowInteropHelper(this).Handle;
+        if (hwnd == IntPtr.Zero) return;
+
+        if (!Topmost) Topmost = true;
+        NativeMethods.SetWindowPos(hwnd, NativeMethods.HWND_TOPMOST, 0, 0, 0, 0,
+            NativeMethods.SWP_NOMOVE | NativeMethods.SWP_NOSIZE | NativeMethods.SWP_NOACTIVATE);
     }
 
     private void ApplySettings()
