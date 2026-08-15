@@ -92,7 +92,7 @@
         <TextBlock Grid.Row="1" x:Name="MainLabelText"
                    FontSize="11" TextAlignment="Center"
                    HorizontalAlignment="Center" VerticalAlignment="Top"
-                   Margin="10,5,10,0" Visibility="Collapsed"
+                   Margin="10,2,10,0" Visibility="Collapsed"
                    SizeChanged="MainLabelText_SizeChanged"/>
 
         <ResizeGrip Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom"

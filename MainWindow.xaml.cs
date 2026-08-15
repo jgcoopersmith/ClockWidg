@@ -279,7 +279,9 @@ public partial class MainWindow : Window
     {
         if (MainLabelText.Visibility != Visibility.Visible) { _currentFace?.SetHeaderInset(0); return; }
 
-        double wanted = MainLabelText.ActualHeight + MainLabelText.Margin.Top + 2;
+        // Just the label's own height and offset — no padding beyond it. Anything extra
+        // reads as a gap between the name and the clock it names.
+        double wanted = MainLabelText.ActualHeight + MainLabelText.Margin.Top;
 
         // On a short widget the label would eat most of the panel and leave the clock a
         // sliver, so it never takes more than a quarter of the face's height.
