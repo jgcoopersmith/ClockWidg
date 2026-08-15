@@ -1,0 +1,27 @@
+#!/bin/sh
+# Bumps the last component of <Version> in ClockWidg.csproj on every commit,
+# so each commit ships a unique, increasing version (shown in the right-click
+# menu as "About - V.x.y.z").
+# Enabled via: git config core.hooksPath .githooks
+cd "$(git rev-parse --show-toplevel)" || exit 0
+
+# A commit of nothing but the published exe is the second half of a code commit
+# that already bumped — bumping again would leave app/ClockWidg.exe permanently
+# reporting a version older than the csproj.
+if ! git diff --cached --name-only | grep -qv '^app/'; then
+    echo "pre-commit: published output only, version unchanged"
+    exit 0
+fi
+
+ver=$(sed -n 's/.*<Version>\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)<\/Version>.*/\1/p' ClockWidg.csproj)
+[ -z "$ver" ] && exit 0
+
+major=${ver%%.*}
+rest=${ver#*.}
+minor=${rest%%.*}
+patch=${rest#*.}
+new="$major.$minor.$((patch + 1))"
+
+sed -i "s|<Version>$ver</Version>|<Version>$new</Version>|" ClockWidg.csproj
+git add ClockWidg.csproj
+echo "pre-commit: version $ver -> $new"
