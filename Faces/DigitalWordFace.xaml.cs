@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using ClockWidg.Models;
@@ -34,6 +35,8 @@ public partial class DigitalWordFace : UserControl, IClockFace
         _defaultLineHeight = WordText.LineHeight;
         _lineHeightRatio = WordText.LineHeight / WordText.FontSize;
     }
+
+    public void SetHeaderInset(double dip) => Panel.Padding = new Thickness(0, dip, 0, 0);
 
     // This face shows no date, so dateFont has nothing to apply to.
     public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont)

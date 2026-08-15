@@ -25,4 +25,10 @@ public interface IClockFace
     /// Faces with no time or date text (the analog faces, and Digital Binary) ignore both.
     /// </summary>
     void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont);
+
+    /// <summary>
+    /// Reserves <paramref name="dip"/> at the top of the face's own panel for the
+    /// location header the window draws over it, so the two never overlap.
+    /// </summary>
+    void SetHeaderInset(double dip);
 }

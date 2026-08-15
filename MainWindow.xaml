@@ -75,8 +75,8 @@
         <Grid.RowDefinitions>
             <!-- Collapsed to zero until at least one city is configured. -->
             <RowDefinition x:Name="LocationRow" Height="0"/>
-            <RowDefinition x:Name="MainLabelRow" Height="0"/>
-            <RowDefinition Height="2*"/>
+            <!-- The clock keeps the larger share; the city strip grows into the rest. -->
+            <RowDefinition Height="3*"/>
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" x:Name="LocationStrip" CornerRadius="16" Visibility="Collapsed">
@@ -85,15 +85,17 @@
             </Viewbox>
         </Border>
 
-        <!-- Which place the big clock below is showing. Deliberately not in a Viewbox:
-             one in an auto-height row scales the label to the widget's full width and
-             swamps the clock it is labelling. -->
-        <TextBlock Grid.Row="1" x:Name="MainLabelText" Margin="10,2"
-                   FontSize="11" TextAlignment="Center"
-                   HorizontalAlignment="Center" Visibility="Collapsed"/>
+        <ContentControl Grid.Row="1" x:Name="FaceHost"/>
 
-        <ContentControl Grid.Row="2" x:Name="FaceHost"/>
-        <ResizeGrip Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+        <!-- Sits inside the clock's own panel, centred at the top. The face reserves
+             room for it via SetHeaderInset, so it never lands on the digits. -->
+        <TextBlock Grid.Row="1" x:Name="MainLabelText"
+                   FontSize="11" TextAlignment="Center"
+                   HorizontalAlignment="Center" VerticalAlignment="Top"
+                   Margin="10,5,10,0" Visibility="Collapsed"
+                   SizeChanged="MainLabelText_SizeChanged"/>
+
+        <ResizeGrip Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                     Width="16" Height="16" Opacity="0.5"
                     MouseLeftButtonDown="ResizeGrip_MouseLeftButtonDown"/>
     </Grid>

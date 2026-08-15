@@ -26,6 +26,8 @@ public partial class AnalogVintageFace : UserControl, IClockFace
         Redraw();
     }
 
+    public void SetHeaderInset(double dip) => Panel.Padding = new Thickness(0, dip, 0, 0);
+
     // The Roman numerals are dial furniture rather than a time readout, so no font applies.
     public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont) { }
 

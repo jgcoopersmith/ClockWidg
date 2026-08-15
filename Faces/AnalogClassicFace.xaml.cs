@@ -23,6 +23,8 @@ public partial class AnalogClassicFace : UserControl, IClockFace
         Redraw();
     }
 
+    public void SetHeaderInset(double dip) => Panel.Padding = new Thickness(0, dip, 0, 0);
+
     // The dial labels are furniture rather than a time readout, so no font applies.
     public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont) { }
 

@@ -29,6 +29,8 @@ public partial class DigitalNeonFace : UserControl, IClockFace
         _dateFont = FontDefaults.From(DateText);
     }
 
+    public void SetHeaderInset(double dip) => Panel.Padding = new Thickness(0, dip, 0, 0);
+
     public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont)
     {
         _timeFont.ApplyTo(TimeText, timeFont);

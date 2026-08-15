@@ -129,6 +129,7 @@ public partial class MainWindow : Window
         _settings.FaceName = faceName;
         ApplyFaceColors();
         ApplyFaceFonts();
+        ApplyHeaderInset();   // a freshly built face starts with no inset
     }
 
     // ---------------- Fonts ----------------
@@ -267,6 +268,27 @@ public partial class MainWindow : Window
 
     // ---------------- Main clock's own place ----------------
 
+    private void MainLabelText_SizeChanged(object sender, SizeChangedEventArgs e) => ApplyHeaderInset();
+
+    /// <summary>
+    /// Tells the face how much room the label needs at the top of its panel. The label
+    /// is drawn over the face rather than above it, so without this it would sit on the
+    /// clock; with it, the clock simply starts lower inside the same panel.
+    /// </summary>
+    private void ApplyHeaderInset()
+    {
+        if (MainLabelText.Visibility != Visibility.Visible) { _currentFace?.SetHeaderInset(0); return; }
+
+        double wanted = MainLabelText.ActualHeight + MainLabelText.Margin.Top + 2;
+
+        // On a short widget the label would eat most of the panel and leave the clock a
+        // sliver, so it never takes more than a quarter of the face's height.
+        double available = FaceHost.ActualHeight;
+        if (available > 0) wanted = Math.Min(wanted, available * 0.25);
+
+        _currentFace?.SetHeaderInset(wanted);
+    }
+
     /// <summary>The time the big clock shows: a chosen city's, or this PC's.</summary>
     private DateTime MainNow()
         => _settings.MainLocation is CityClock city
@@ -304,7 +326,7 @@ public partial class MainWindow : Window
         bool labelMain = cities.Count > 0 || _settings.MainLocation != null;
         MainLabelText.Text = MainLocationLabel();
         MainLabelText.Visibility = labelMain ? Visibility.Visible : Visibility.Collapsed;
-        MainLabelRow.Height = labelMain ? GridLength.Auto : new GridLength(0);
+        ApplyHeaderInset();
 
         if (cities.Count == 0)
         {
@@ -612,7 +634,12 @@ public partial class MainWindow : Window
     }
 
     protected override void OnLocationChanged(EventArgs e) { SaveSettings(); base.OnLocationChanged(e); }
-    protected override void OnRenderSizeChanged(SizeChangedInfo info) { SaveSettings(); base.OnRenderSizeChanged(info); }
+    protected override void OnRenderSizeChanged(SizeChangedInfo info)
+    {
+        SaveSettings();
+        ApplyHeaderInset();   // the cap is a share of the face's height, which just changed
+        base.OnRenderSizeChanged(info);
+    }
 
     private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
     {

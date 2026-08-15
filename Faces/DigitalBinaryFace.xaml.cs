@@ -25,6 +25,8 @@ public partial class DigitalBinaryFace : UserControl, IClockFace
         Redraw();
     }
 
+    public void SetHeaderInset(double dip) => Panel.Padding = new Thickness(0, dip, 0, 0);
+
     // The lit dots are the readout and the H/M/S labels are sized from the
     // widget geometry, so there is no font to apply.
     public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont) { }

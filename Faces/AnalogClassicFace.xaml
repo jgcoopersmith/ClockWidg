@@ -1,5 +1,9 @@
 <UserControl x:Class="ClockWidg.Faces.AnalogClassicFace"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Canvas x:Name="ClockCanvas" SizeChanged="Canvas_SizeChanged"/>
+    <!-- Panel is the inset host every face shares, so the location header can push
+         the clock down without each face knowing about it. -->
+    <Border x:Name="Panel">
+        <Canvas x:Name="ClockCanvas" SizeChanged="Canvas_SizeChanged"/>
+    </Border>
 </UserControl>

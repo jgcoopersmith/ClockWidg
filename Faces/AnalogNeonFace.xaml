@@ -1,5 +1,7 @@
 <UserControl x:Class="ClockWidg.Faces.AnalogNeonFace"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Canvas x:Name="ClockCanvas" Background="Black" SizeChanged="Canvas_SizeChanged"/>
+    <Border x:Name="Panel" Background="Black" CornerRadius="16">
+        <Canvas x:Name="ClockCanvas" Background="Transparent" SizeChanged="Canvas_SizeChanged"/>
+    </Border>
 </UserControl>

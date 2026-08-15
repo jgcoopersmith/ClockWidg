@@ -18,7 +18,7 @@ public partial class AnalogNeonFace : UserControl, IClockFace
     public AnalogNeonFace()
     {
         InitializeComponent();
-        _defaultBackground = ClockCanvas.Background;
+        _defaultBackground = Panel.Background;
     }
 
     public void UpdateTime(DateTime time, bool showSeconds, bool use24Hour, bool showDate)
@@ -27,6 +27,8 @@ public partial class AnalogNeonFace : UserControl, IClockFace
         Redraw();
     }
 
+    public void SetHeaderInset(double dip) => Panel.Padding = new Thickness(0, dip, 0, 0);
+
     // This face draws no text at all, so no font applies.
     public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont) { }
 
@@ -34,7 +36,7 @@ public partial class AnalogNeonFace : UserControl, IClockFace
     public void ApplyColors(Color? timeColor, Color? dateColor, Color? backgroundColor, double backgroundOpacity, double textOpacity)
     {
         _timeColor = timeColor;
-        ClockCanvas.Background = FaceBrush.Background(backgroundColor, _defaultBackground, backgroundOpacity);
+        Panel.Background = FaceBrush.Background(backgroundColor, _defaultBackground, backgroundOpacity);
         Redraw();
     }
 

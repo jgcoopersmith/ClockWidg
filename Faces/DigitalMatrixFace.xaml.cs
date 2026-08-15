@@ -34,6 +34,8 @@ public partial class DigitalMatrixFace : UserControl, IClockFace
         _yearFont = FontDefaults.From(Line3);
     }
 
+    public void SetHeaderInset(double dip) => Panel.Padding = new Thickness(0, dip, 0, 0);
+
     public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont)
     {
         _timeFont.ApplyTo(Line1, timeFont);
