@@ -36,11 +36,12 @@ public partial class MainWindow : Window
 
     private void Timer_Tick(object? sender, EventArgs e)
     {
-        DateTime now = DateTime.Now;
-        _currentFace?.UpdateTime(now, _settings.ShowSeconds, _settings.Use24Hour, _settings.ShowDate);
-        UpdateLocationTimes(now.ToUniversalTime());
+        _currentFace?.UpdateTime(MainNow(), _settings.ShowSeconds, _settings.Use24Hour, _settings.ShowDate);
+        UpdateLocationTimes(DateTime.UtcNow);
         ReassertTopmost();
-        CheckAlarms(now);
+        // Alarms are wall-clock times on this PC, so they stay on local time even when
+        // the big clock is showing somewhere else.
+        CheckAlarms(DateTime.Now);
     }
 
     /// <summary>
@@ -87,6 +88,7 @@ public partial class MainWindow : Window
         UpdateFaceMenuChecks();
         MenuAbout.Header = $"About - V.{AppVersion}";
         RebuildLocationStrip();
+        BuildLocationMenu();
     }
 
     /// <summary>The assembly's version, as set by &lt;Version&gt; in the csproj.</summary>
@@ -140,18 +142,83 @@ public partial class MainWindow : Window
     }
 
     private void RefreshFace()
-        => _currentFace?.UpdateTime(DateTime.Now, _settings.ShowSeconds, _settings.Use24Hour, _settings.ShowDate);
+        => _currentFace?.UpdateTime(MainNow(), _settings.ShowSeconds, _settings.Use24Hour, _settings.ShowDate);
 
     // ---------------- Location strip ----------------
     // The time TextBlock for each configured city, paired with the zone it reads.
     private readonly List<(TextBlock Time, TimeZoneInfo Zone)> _locationRows = new();
 
+    /// <summary>
+    /// The Location menu is built from the cities themselves: each configured city is a
+    /// tick box carrying its own name. StaysOpenOnClick keeps the menu up so several can
+    /// be toggled in one visit.
+    /// </summary>
+    private void BuildLocationMenu()
+    {
+        MenuLocation.Items.Clear();
+
+        foreach (var (city, index) in _settings.Locations.Select((c, i) => (c, i)))
+        {
+            var toggle = new MenuItem
+            {
+                Header = city.Name,
+                IsCheckable = true,
+                IsChecked = city.Visible,
+                StaysOpenOnClick = true,
+                Tag = index,
+            };
+            toggle.Click += CityVisibility_Click;
+            MenuLocation.Items.Add(toggle);
+        }
+
+        if (_settings.Locations.Count > 0) MenuLocation.Items.Add(new Separator());
+
+        for (int slot = 0; slot < ClockSettings.MaxLocations; slot++)
+        {
+            var edit = new MenuItem
+            {
+                Header = slot < _settings.Locations.Count
+                    ? $"Change {_settings.Locations[slot].Name}…"
+                    : $"Set City {slot + 1}…",
+                Tag = slot,
+            };
+            edit.Click += MenuLocationSlot_Click;
+            MenuLocation.Items.Add(edit);
+        }
+
+        MenuLocation.Items.Add(new Separator());
+
+        var main = new MenuItem { Header = $"Main Clock: {MainLocationLabel()}…" };
+        main.Click += MenuMainLocation_Click;
+        MenuLocation.Items.Add(main);
+
+        if (_settings.Locations.Count > 0)
+        {
+            var clear = new MenuItem { Header = "Clear All Cities" };
+            clear.Click += MenuClearLocations_Click;
+            MenuLocation.Items.Add(clear);
+        }
+    }
+
+    private void CityVisibility_Click(object sender, RoutedEventArgs e)
+    {
+        var item = (MenuItem)sender;
+        int index = (int)item.Tag;
+        if (index >= _settings.Locations.Count) return;
+
+        _settings.Locations[index].Visible = item.IsChecked;
+        RebuildLocationStrip();
+        SaveSettings();
+        // Deliberately not rebuilding the menu here — that would tear down the very
+        // item being clicked and close the menu we are keeping open.
+    }
+
     private void MenuLocationSlot_Click(object sender, RoutedEventArgs e)
     {
-        int slot = int.Parse((string)((MenuItem)sender).Tag);
+        int slot = (int)((MenuItem)sender).Tag;
         CityClock? existing = slot < _settings.Locations.Count ? _settings.Locations[slot] : null;
 
-        var dlg = new LocationPickerWindow(slot, existing, _geo) { Owner = this };
+        var dlg = new LocationPickerWindow($"CITY {slot + 1}", existing, _geo) { Owner = this };
         if (dlg.ShowDialog() != true) return;
 
         if (dlg.Removed)
@@ -160,11 +227,33 @@ public partial class MainWindow : Window
         }
         else if (dlg.Result is CityClock city)
         {
-            if (slot < _settings.Locations.Count) _settings.Locations[slot] = city;
-            else if (_settings.Locations.Count < ClockSettings.MaxLocations) _settings.Locations.Add(city);
+            if (slot < _settings.Locations.Count)
+            {
+                city.Visible = _settings.Locations[slot].Visible;
+                _settings.Locations[slot] = city;
+            }
+            else if (_settings.Locations.Count < ClockSettings.MaxLocations)
+            {
+                _settings.Locations.Add(city);
+            }
         }
 
         RebuildLocationStrip();
+        BuildLocationMenu();
+        SaveSettings();
+    }
+
+    private void MenuMainLocation_Click(object sender, RoutedEventArgs e)
+    {
+        var dlg = new LocationPickerWindow("MAIN CLOCK", _settings.MainLocation, _geo) { Owner = this };
+        if (dlg.ShowDialog() != true) return;
+
+        // Removing the main location hands the big clock back to this PC's own time.
+        _settings.MainLocation = dlg.Removed ? null : dlg.Result;
+
+        RebuildLocationStrip();
+        BuildLocationMenu();
+        RefreshFace();
         SaveSettings();
     }
 
@@ -172,7 +261,32 @@ public partial class MainWindow : Window
     {
         _settings.Locations.Clear();
         RebuildLocationStrip();
+        BuildLocationMenu();
         SaveSettings();
+    }
+
+    // ---------------- Main clock's own place ----------------
+
+    /// <summary>The time the big clock shows: a chosen city's, or this PC's.</summary>
+    private DateTime MainNow()
+        => _settings.MainLocation is CityClock city
+            ? TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, TimeZones.Resolve(city.TimeZoneId))
+            : DateTime.Now;
+
+    /// <summary>
+    /// What to call the big clock's place. A city the user picked wins; otherwise the
+    /// machine's own zone names it — "America/Denver" reads as "DENVER".
+    /// </summary>
+    private string MainLocationLabel()
+    {
+        if (_settings.MainLocation is CityClock city && city.Name.Length > 0) return city.Name;
+
+        string id = TimeZoneInfo.Local.Id;
+        if (TimeZoneInfo.TryConvertWindowsIdToIanaId(id, out string? iana) && iana is not null) id = iana;
+
+        int slash = id.LastIndexOf('/');
+        string place = slash >= 0 ? id[(slash + 1)..] : id;
+        return place.Replace('_', ' ').ToUpperInvariant();
     }
 
     private void RebuildLocationStrip()
@@ -180,11 +294,23 @@ public partial class MainWindow : Window
         _locationRows.Clear();
         LocationRows.Children.Clear();
 
-        var cities = _settings.Locations.Take(ClockSettings.MaxLocations).ToList();
+        var cities = _settings.Locations
+            .Take(ClockSettings.MaxLocations)
+            .Where(c => c.Visible)
+            .ToList();
+
+        // The big clock is only worth labelling once there is another place to confuse
+        // it with, or when it is showing somewhere other than this PC.
+        bool labelMain = cities.Count > 0 || _settings.MainLocation != null;
+        MainLabelText.Text = MainLocationLabel();
+        MainLabelText.Visibility = labelMain ? Visibility.Visible : Visibility.Collapsed;
+        MainLabelRow.Height = labelMain ? GridLength.Auto : new GridLength(0);
+
         if (cities.Count == 0)
         {
             LocationStrip.Visibility = Visibility.Collapsed;
             LocationRow.Height = new GridLength(0);
+            StyleLocationStrip();
             return;
         }
 
@@ -252,6 +378,13 @@ public partial class MainWindow : Window
         var timeBrush = ParseColor(_settings.TimeColor) is System.Windows.Media.Color t
             ? new System.Windows.Media.SolidColorBrush(t)
             : System.Windows.Media.Brushes.White;
+
+        MainLabelText.Foreground = ParseColor(_settings.DateColor) is System.Windows.Media.Color m
+            ? new System.Windows.Media.SolidColorBrush(m)
+            : System.Windows.Media.Brushes.LightGray;
+        MainLabelText.Opacity = _settings.TextOpacity;
+        if (_settings.DateFont is FontChoice mf)
+            MainLabelText.FontFamily = new System.Windows.Media.FontFamily(mf.Family);
 
         foreach (Grid row in LocationRows.Children.OfType<Grid>())
         {

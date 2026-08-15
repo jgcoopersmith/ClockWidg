@@ -21,12 +21,12 @@ public partial class LocationPickerWindow : Window
     /// <summary>True when the user asked for this slot to be emptied.</summary>
     public bool Removed { get; private set; }
 
-    public LocationPickerWindow(int slot, CityClock? existing, GeoService geo)
+    public LocationPickerWindow(string header, CityClock? existing, GeoService geo)
     {
         InitializeComponent();
         _geo = geo;
 
-        HeaderText.Text = $"CITY {slot + 1}";
+        HeaderText.Text = header;
         RemoveButton.Visibility = existing is null ? Visibility.Collapsed : Visibility.Visible;
 
         if (existing != null)

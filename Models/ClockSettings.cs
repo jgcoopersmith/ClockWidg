@@ -28,6 +28,8 @@ public class ClockSettings
     public ObservableCollection<AlarmItem> Alarms { get; set; } = new();
     // Up to MaxLocations city clocks, shown stacked above the face.
     public List<CityClock> Locations { get; set; } = new();
+    /// <summary>What the big clock shows. Null means this PC's own time and place.</summary>
+    public CityClock? MainLocation { get; set; }
 
     public const int MaxLocations = 3;
 }

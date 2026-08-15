@@ -8,4 +8,6 @@ public class CityClock
     public string TimeZoneId { get; set; } = "";
     /// <summary>What the user typed, kept so the picker reopens on it.</summary>
     public string Query { get; set; } = "";
+    /// <summary>Ticked in the Location menu, i.e. shown in the strip.</summary>
+    public bool Visible { get; set; } = true;
 }
