@@ -14,6 +14,7 @@ namespace ClockWidg;
 public partial class MainWindow : Window
 {
     private readonly SettingsService _settingsService = new();
+    private readonly GeoService _geo = new();
     private ClockSettings _settings = new();
     private readonly DispatcherTimer _timer = new();
     private IClockFace? _currentFace;
@@ -150,7 +151,7 @@ public partial class MainWindow : Window
         int slot = int.Parse((string)((MenuItem)sender).Tag);
         CityClock? existing = slot < _settings.Locations.Count ? _settings.Locations[slot] : null;
 
-        var dlg = new LocationPickerWindow(existing) { Owner = this };
+        var dlg = new LocationPickerWindow(slot, existing, _geo) { Owner = this };
         if (dlg.ShowDialog() != true) return;
 
         if (dlg.Removed)
@@ -224,11 +225,8 @@ public partial class MainWindow : Window
         UpdateLocationTimes(DateTime.UtcNow);
     }
 
-    private static TimeZoneInfo ResolveZone(string id)
-    {
-        try { return TimeZoneInfo.FindSystemTimeZoneById(id); }
-        catch { return TimeZoneInfo.Local; } // zone uninstalled or renamed
-    }
+    // Zone ids are stored in IANA form; TimeZones maps them onto whatever Windows calls them.
+    private static TimeZoneInfo ResolveZone(string id) => TimeZones.Resolve(id);
 
     private void UpdateLocationTimes(DateTime utcNow)
     {

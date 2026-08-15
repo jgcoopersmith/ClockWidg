@@ -1,36 +1,130 @@
 <Window x:Class="ClockWidg.LocationPickerWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Choose a City" Width="420" Height="480"
-        WindowStartupLocation="CenterScreen"
-        ShowInTaskbar="False"
-        Background="#1e1e2e">
-    <Grid Margin="12">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+        Title="ClockWidg location"
+        Width="340" SizeToContent="Height" ResizeMode="NoResize"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ShowInTaskbar="False" WindowStartupLocation="CenterScreen"
+        UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
 
-        <TextBlock Grid.Row="0" Text="Search" Foreground="#9999BB" Margin="0,0,0,4"/>
-        <TextBox  Grid.Row="1" x:Name="SearchBox" Padding="4" Margin="0,0,0,10"
-                  TextChanged="SearchBox_TextChanged"/>
+    <Window.Resources>
+        <SolidColorBrush x:Key="Ink" Color="#E6EDF3"/>
+        <SolidColorBrush x:Key="Muted" Color="#8FA0B4"/>
+        <SolidColorBrush x:Key="FieldBg" Color="#14FFFFFF"/>
+        <SolidColorBrush x:Key="Accent" Color="#5AA9FF"/>
 
-        <ListBox Grid.Row="2" x:Name="ZoneList"
-                 SelectionChanged="ZoneList_SelectionChanged"
-                 MouseDoubleClick="ZoneList_MouseDoubleClick"/>
+        <!-- The stock chrome is a light-theme 3D border; replace it outright rather than
+             trying to recolour it into something that suits a dark card. -->
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="Background" Value="{StaticResource FieldBg}"/>
+            <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+            <Setter Property="CaretBrush" Value="{StaticResource Ink}"/>
+            <Setter Property="SelectionBrush" Value="{StaticResource Accent}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="Transparent"/>
+            <Setter Property="Padding" Value="6,3"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type TextBox}">
+                        <Border x:Name="Bd" CornerRadius="4"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Accent}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-        <StackPanel Grid.Row="3" Margin="0,10,0,0">
-            <TextBlock Text="Label shown on the widget" Foreground="#9999BB" Margin="0,0,0,4"/>
-            <TextBox x:Name="LabelBox" Padding="4"/>
-        </StackPanel>
+        <Style x:Key="Label" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="{StaticResource Muted}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,0,10,0"/>
+        </Style>
 
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
-            <Button Content="Remove"  Width="80" Margin="0,0,8,0" Click="Remove_Click"/>
-            <Button Content="Cancel"  Width="80" Margin="0,0,8,0" IsCancel="True"/>
-            <Button Content="OK"      Width="80" IsDefault="True" Click="Ok_Click"/>
-        </StackPanel>
-    </Grid>
+        <Style x:Key="Chip" TargetType="{x:Type Button}">
+            <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+            <Setter Property="Background" Value="#1AFFFFFF"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="14,5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Bd" CornerRadius="5" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.82"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Opacity" Value="0.65"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border CornerRadius="14" Background="#F50E1116" BorderBrush="#22FFFFFF" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect BlurRadius="22" ShadowDepth="0" Opacity="0.6" Color="Black"/>
+        </Border.Effect>
+
+        <Grid Margin="18,14,18,14">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>   <!-- header -->
+                <RowDefinition Height="Auto"/>   <!-- city -->
+                <RowDefinition Height="Auto"/>   <!-- label -->
+                <RowDefinition Height="Auto"/>   <!-- hint / error -->
+                <RowDefinition Height="Auto"/>   <!-- buttons -->
+            </Grid.RowDefinitions>
+
+            <DockPanel Grid.Row="0" Grid.ColumnSpan="2" Margin="0,0,0,12">
+                <TextBlock x:Name="HeaderText" Text="CITY 1" FontSize="10" FontWeight="SemiBold"
+                           Foreground="{StaticResource Muted}" Opacity="0.9"/>
+                <TextBlock DockPanel.Dock="Right" HorizontalAlignment="Right" Text="location"
+                           FontSize="10" Foreground="{StaticResource Muted}" Opacity="0.55"/>
+            </DockPanel>
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="City" Style="{StaticResource Label}"/>
+            <TextBox   Grid.Row="1" Grid.Column="1" x:Name="LocationBox" Margin="0,0,0,6"/>
+
+            <TextBlock Grid.Row="2" Grid.Column="0" Text="Shows as" Style="{StaticResource Label}"/>
+            <TextBox   Grid.Row="2" Grid.Column="1" x:Name="LabelBox"
+                       ToolTip="Leave blank to use the city's own name"/>
+
+            <TextBlock Grid.Row="3" Grid.ColumnSpan="2" x:Name="NoteText" TextWrapping="Wrap"
+                       Margin="0,8,0,0" FontSize="10"
+                       Foreground="{StaticResource Muted}" Opacity="0.6"
+                       Text="A town (Boston · Springfield, IL · Lyon, FR), a ZIP or postal code (02134 · SW1A 1AA, UK), or an airport code (KDEN, EGLL). The clock follows that city's own time zone, DST included."/>
+
+            <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Orientation="Horizontal"
+                        HorizontalAlignment="Right" Margin="0,14,0,0">
+                <Button x:Name="RemoveButton" Content="Remove" Style="{StaticResource Chip}"
+                        Margin="0,0,8,0" Click="Remove_Click"/>
+                <Button x:Name="CancelButton" Content="Cancel" Style="{StaticResource Chip}"
+                        Margin="0,0,8,0" IsCancel="True" Click="Cancel_Click"/>
+                <Button x:Name="SaveButton" Content="Save" Style="{StaticResource Chip}"
+                        Background="#335AA9FF" Foreground="#9FD0FF" IsDefault="True" Click="Save_Click"/>
+            </StackPanel>
+        </Grid>
+    </Border>
 </Window>
