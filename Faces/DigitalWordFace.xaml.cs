@@ -36,7 +36,24 @@ public partial class DigitalWordFace : UserControl, IClockFace
         _lineHeightRatio = WordText.LineHeight / WordText.FontSize;
     }
 
-    public void SetHeaderInset(double dip) => Panel.Padding = new Thickness(0, dip, 0, 0);
+    public void SetHeaderInset(double dip)
+    {
+        Panel.Padding = new Thickness(0, dip, 0, 0);
+        if (Panel.Child is Viewbox box)
+        {
+            box.Tag ??= box.Margin;   // remember the designed margin once
+            var designed = (Thickness)box.Tag;
+
+            // The face pads its own top to breathe against the panel edge. With a header
+            // there, that padding is doubled separation — drop it while the header shows.
+            box.Margin = new Thickness(designed.Left, dip > 0 ? 0 : designed.Top,
+                                       designed.Right, designed.Bottom);
+
+            // Uniform scaling leaves vertical slack, which the Viewbox centres — half of
+            // it lands under the header and reads as a gap. Pin the content to the top.
+            box.VerticalAlignment = dip > 0 ? VerticalAlignment.Top : VerticalAlignment.Stretch;
+        }
+    }
 
     // This face shows no date, so dateFont has nothing to apply to.
     public void ApplyFonts(FontChoice? timeFont, FontChoice? dateFont)

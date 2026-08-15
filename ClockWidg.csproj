@@ -14,7 +14,7 @@
     <RootNamespace>ClockWidg</RootNamespace>
     <ApplicationIcon>ClockWidg.ico</ApplicationIcon>
     <!-- Bumped automatically by .githooks/pre-commit; do not edit by hand. -->
-    <Version>1.2.2</Version>
+    <Version>1.2.3</Version>
   </PropertyGroup>
   <ItemGroup>
     <Using Remove="System.Drawing" />
