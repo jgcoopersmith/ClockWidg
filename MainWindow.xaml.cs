@@ -37,6 +37,7 @@ public partial class MainWindow : Window
     {
         DateTime now = DateTime.Now;
         _currentFace?.UpdateTime(now, _settings.ShowSeconds, _settings.Use24Hour, _settings.ShowDate);
+        UpdateLocationTimes(now.ToUniversalTime());
         ReassertTopmost();
         CheckAlarms(now);
     }
@@ -84,6 +85,7 @@ public partial class MainWindow : Window
         LoadFace(_settings.FaceName);
         UpdateFaceMenuChecks();
         MenuAbout.Header = $"About - V.{AppVersion}";
+        RebuildLocationStrip();
     }
 
     /// <summary>The assembly's version, as set by &lt;Version&gt; in the csproj.</summary>
@@ -130,10 +132,143 @@ public partial class MainWindow : Window
     // WPF sizes text in DIPs (1/96"), the font picker in points (1/72").
     private const double PointsToDips = 96.0 / 72.0;
 
-    private void ApplyFaceFonts() => _currentFace?.ApplyFonts(_settings.TimeFont, _settings.DateFont);
+    private void ApplyFaceFonts()
+    {
+        _currentFace?.ApplyFonts(_settings.TimeFont, _settings.DateFont);
+        StyleLocationStrip();
+    }
 
     private void RefreshFace()
         => _currentFace?.UpdateTime(DateTime.Now, _settings.ShowSeconds, _settings.Use24Hour, _settings.ShowDate);
+
+    // ---------------- Location strip ----------------
+    // The time TextBlock for each configured city, paired with the zone it reads.
+    private readonly List<(TextBlock Time, TimeZoneInfo Zone)> _locationRows = new();
+
+    private void MenuLocationSlot_Click(object sender, RoutedEventArgs e)
+    {
+        int slot = int.Parse((string)((MenuItem)sender).Tag);
+        CityClock? existing = slot < _settings.Locations.Count ? _settings.Locations[slot] : null;
+
+        var dlg = new LocationPickerWindow(existing) { Owner = this };
+        if (dlg.ShowDialog() != true) return;
+
+        if (dlg.Removed)
+        {
+            if (slot < _settings.Locations.Count) _settings.Locations.RemoveAt(slot);
+        }
+        else if (dlg.Result is CityClock city)
+        {
+            if (slot < _settings.Locations.Count) _settings.Locations[slot] = city;
+            else if (_settings.Locations.Count < ClockSettings.MaxLocations) _settings.Locations.Add(city);
+        }
+
+        RebuildLocationStrip();
+        SaveSettings();
+    }
+
+    private void MenuClearLocations_Click(object sender, RoutedEventArgs e)
+    {
+        _settings.Locations.Clear();
+        RebuildLocationStrip();
+        SaveSettings();
+    }
+
+    private void RebuildLocationStrip()
+    {
+        _locationRows.Clear();
+        LocationRows.Children.Clear();
+
+        var cities = _settings.Locations.Take(ClockSettings.MaxLocations).ToList();
+        if (cities.Count == 0)
+        {
+            LocationStrip.Visibility = Visibility.Collapsed;
+            LocationRow.Height = new GridLength(0);
+            return;
+        }
+
+        LocationStrip.Visibility = Visibility.Visible;
+        // One star per city, against the face's two, so the strip grows with the list
+        // instead of squeezing the clock to nothing.
+        LocationRow.Height = new GridLength(cities.Count, GridUnitType.Star);
+
+        foreach (var city in cities)
+        {
+            var row = new Grid { Margin = new Thickness(0, 1, 0, 1) };
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            var name = new TextBlock
+            {
+                Text = city.Name,
+                FontSize = 13,
+                Margin = new Thickness(0, 0, 12, 0),
+                VerticalAlignment = VerticalAlignment.Center,
+            };
+            var time = new TextBlock
+            {
+                FontSize = 15,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Right,
+            };
+            Grid.SetColumn(name, 0);
+            Grid.SetColumn(time, 1);
+            row.Children.Add(name);
+            row.Children.Add(time);
+            LocationRows.Children.Add(row);
+
+            _locationRows.Add((time, ResolveZone(city.TimeZoneId)));
+        }
+
+        StyleLocationStrip();
+        UpdateLocationTimes(DateTime.UtcNow);
+    }
+
+    private static TimeZoneInfo ResolveZone(string id)
+    {
+        try { return TimeZoneInfo.FindSystemTimeZoneById(id); }
+        catch { return TimeZoneInfo.Local; } // zone uninstalled or renamed
+    }
+
+    private void UpdateLocationTimes(DateTime utcNow)
+    {
+        string fmt = _settings.Use24Hour
+            ? (_settings.ShowSeconds ? "HH:mm:ss" : "HH:mm")
+            : (_settings.ShowSeconds ? "h:mm:ss tt" : "h:mm tt");
+
+        foreach (var (text, zone) in _locationRows)
+            text.Text = TimeZoneInfo.ConvertTimeFromUtc(utcNow, zone).ToString(fmt);
+    }
+
+    /// <summary>Keeps the strip in step with the colour, font and opacity menus.</summary>
+    private void StyleLocationStrip()
+    {
+        LocationStrip.Background = Faces.FaceBrush.Background(
+            ParseColor(_settings.BackgroundColor),
+            System.Windows.Media.Brushes.Black,
+            _settings.BackgroundOpacity);
+
+        var nameBrush = ParseColor(_settings.DateColor) is System.Windows.Media.Color d
+            ? new System.Windows.Media.SolidColorBrush(d)
+            : System.Windows.Media.Brushes.LightGray;
+        var timeBrush = ParseColor(_settings.TimeColor) is System.Windows.Media.Color t
+            ? new System.Windows.Media.SolidColorBrush(t)
+            : System.Windows.Media.Brushes.White;
+
+        foreach (Grid row in LocationRows.Children.OfType<Grid>())
+        {
+            if (row.Children.Count < 2) continue;
+            var name = (TextBlock)row.Children[0];
+            var time = (TextBlock)row.Children[1];
+
+            name.Foreground = nameBrush;
+            time.Foreground = timeBrush;
+            name.Opacity = time.Opacity = _settings.TextOpacity;
+
+            if (_settings.DateFont is FontChoice df) name.FontFamily = new System.Windows.Media.FontFamily(df.Family);
+            if (_settings.TimeFont is FontChoice tf) time.FontFamily = new System.Windows.Media.FontFamily(tf.Family);
+        }
+    }
 
     private void MenuTimeFont_Click(object sender, RoutedEventArgs e) => PickFont(forTime: true);
 
@@ -187,12 +322,15 @@ public partial class MainWindow : Window
 
     // ---------------- Colours ----------------
     private void ApplyFaceColors()
-        => _currentFace?.ApplyColors(
+    {
+        _currentFace?.ApplyColors(
             ParseColor(_settings.TimeColor),
             ParseColor(_settings.DateColor),
             ParseColor(_settings.BackgroundColor),
             _settings.BackgroundOpacity,
             _settings.TextOpacity);
+        StyleLocationStrip();
+    }
 
     private static System.Windows.Media.Color? ParseColor(string? hex)
     {

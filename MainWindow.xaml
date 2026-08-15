@@ -64,14 +64,33 @@
                 <Separator/>
                 <MenuItem Header="Use Face Defaults" Click="MenuResetColors_Click"/>
             </MenuItem>
+            <MenuItem Header="Location" x:Name="MenuLocation">
+                <MenuItem Header="City 1…" Tag="0" Click="MenuLocationSlot_Click"/>
+                <MenuItem Header="City 2…" Tag="1" Click="MenuLocationSlot_Click"/>
+                <MenuItem Header="City 3…" Tag="2" Click="MenuLocationSlot_Click"/>
+                <Separator/>
+                <MenuItem Header="Clear All" Click="MenuClearLocations_Click"/>
+            </MenuItem>
             <Separator/>
             <MenuItem Header="About" x:Name="MenuAbout"/>
             <MenuItem Header="Exit" Click="MenuExit_Click"/>
         </ContextMenu>
     </Window.ContextMenu>
     <Grid>
-        <ContentControl x:Name="FaceHost"/>
-        <ResizeGrip HorizontalAlignment="Right" VerticalAlignment="Bottom"
+        <Grid.RowDefinitions>
+            <!-- Collapsed to zero until at least one city is configured. -->
+            <RowDefinition x:Name="LocationRow" Height="0"/>
+            <RowDefinition Height="2*"/>
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" x:Name="LocationStrip" CornerRadius="16" Visibility="Collapsed">
+            <Viewbox Stretch="Uniform" Margin="10,6">
+                <StackPanel x:Name="LocationRows"/>
+            </Viewbox>
+        </Border>
+
+        <ContentControl Grid.Row="1" x:Name="FaceHost"/>
+        <ResizeGrip Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Bottom"
                     Width="16" Height="16" Opacity="0.5"
                     MouseLeftButtonDown="ResizeGrip_MouseLeftButtonDown"/>
     </Grid>

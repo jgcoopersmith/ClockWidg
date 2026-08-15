@@ -26,4 +26,8 @@ public class ClockSettings
     public FontChoice? TimeFont { get; set; }
     public FontChoice? DateFont { get; set; }
     public ObservableCollection<AlarmItem> Alarms { get; set; } = new();
+    // Up to MaxLocations city clocks, shown stacked above the face.
+    public List<CityClock> Locations { get; set; } = new();
+
+    public const int MaxLocations = 3;
 }

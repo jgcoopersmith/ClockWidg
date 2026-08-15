@@ -1,0 +1,36 @@
+<Window x:Class="ClockWidg.LocationPickerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Choose a City" Width="420" Height="480"
+        WindowStartupLocation="CenterScreen"
+        ShowInTaskbar="False"
+        Background="#1e1e2e">
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Search" Foreground="#9999BB" Margin="0,0,0,4"/>
+        <TextBox  Grid.Row="1" x:Name="SearchBox" Padding="4" Margin="0,0,0,10"
+                  TextChanged="SearchBox_TextChanged"/>
+
+        <ListBox Grid.Row="2" x:Name="ZoneList"
+                 SelectionChanged="ZoneList_SelectionChanged"
+                 MouseDoubleClick="ZoneList_MouseDoubleClick"/>
+
+        <StackPanel Grid.Row="3" Margin="0,10,0,0">
+            <TextBlock Text="Label shown on the widget" Foreground="#9999BB" Margin="0,0,0,4"/>
+            <TextBox x:Name="LabelBox" Padding="4"/>
+        </StackPanel>
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Content="Remove"  Width="80" Margin="0,0,8,0" Click="Remove_Click"/>
+            <Button Content="Cancel"  Width="80" Margin="0,0,8,0" IsCancel="True"/>
+            <Button Content="OK"      Width="80" IsDefault="True" Click="Ok_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>
